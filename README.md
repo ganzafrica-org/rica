@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RICA — Farm Products & Processes Inspection Unit
 
-## Getting Started
+Inspector portal for **RICA** (Rwanda Inspectorate, Competition and Consumer Protection Authority). Demo app with role-based portals for Inspectors, Directors, and Senior Directors.
 
-First, run the development server:
+## What’s done
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Glassmorphism **login page** with email/password and demo account fill
+- **Cookie-based demo auth** (`/api/auth/login`, `/logout`, `/me`)
+- **Role routing** via `src/proxy.ts` — each user only reaches their portal
+- **Inspector portal** (primary build):
+  - Collapsible sidebar + top navbar with profile dropdown (Profile, Setting, Logout)
+  - Dashboard with KPI cards, Recharts charts, and inspections data table
+  - Regulatory stream pages (Seed Inspection, Slaughterhouse, Agrochemical, Seed Producer)
+  - Reports page
+- **Director** and **Senior Director** portal routes + nav shells (placeholder screens)
+- Shared **UI kit** on HeroUI (buttons, inputs, tables, cards, chips, etc.)
+- RICA design tokens (green accent, stream colors, shell vs body radius)
+
+## Technologies
+
+| Layer | Stack |
+| --- | --- |
+| Framework | [Next.js](https://nextjs.org) 16 (App Router, Turbopack) |
+| UI | [React](https://react.dev) 19, [HeroUI](https://www.heroui.com) 3, [Tailwind CSS](https://tailwindcss.com) 4 |
+| Charts | [Recharts](https://recharts.org) |
+| Motion | [Framer Motion](https://www.framer.com/motion/) |
+| Icons | [Lucide React](https://lucide.dev) |
+| Data fetching | [TanStack Query](https://tanstack.com/query) (wired in providers) |
+| Language | TypeScript |
+
+## Project structure
+
+```text
+src/
+├── app/
+│   ├── (portals)/              # Authenticated portals (shared AppShell)
+│   │   ├── inspector/          # Inspector dashboard, streams, reports
+│   │   ├── director/           # Director portal (placeholder pages)
+│   │   └── senior-director/    # Senior Director portal (placeholder pages)
+│   ├── api/auth/               # login, logout, me
+│   ├── api/health/
+│   ├── login/                  # Public login page
+│   ├── globals.css             # RICA theme + login styles
+│   ├── layout.tsx
+│   └── providers.tsx
+├── components/
+│   ├── auth/                   # AuthProvider, LoginForm
+│   ├── dashboard/              # KPIs, charts, tables, portal home
+│   ├── layout/                 # AppShell, sidebar, navbar, page title
+│   ├── motion/
+│   └── ui/                     # HeroUI wrappers + DataTable, StatusChip, …
+├── data/                       # Navigation, dashboard mock data, demo users
+├── hooks/
+├── lib/                        # Auth helpers, session, constants, utils
+├── types/
+└── proxy.ts                    # Auth + role guards (Next.js Proxy)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Path alias: `@/*` → `./src/*`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Getting started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Requirements
 
-## Learn More
+- Node.js 20+ (recommended)
+- npm
 
-To learn more about Next.js, take a look at the following resources:
+### Install & run
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000) — you’ll be redirected to `/login`.
 
-## Deploy on Vercel
+### Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev      # Development server
+npm run build    # Production build
+npm run start    # Run production build
+npm run lint     # ESLint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Demo accounts
+
+Password for all: `Admin@123!`
+
+| Role | Email | Lands on |
+| --- | --- | --- |
+| Inspector | `jeannine.uwase@gmail.com` | `/inspector` |
+| Director | `gentilleuwamahoro28@gmail.com` | `/director` |
+| Senior Director | `jannine.uwase@gmail.com` | `/senior-director` |
+
+> Auth is **demo-only** (shared password, cookie session). Not for production security.
+
+### Tip
+
+On the login page, use the sparkle button (bottom-right) or **Continue with Google** to cycle/fill demo credentials quickly.
