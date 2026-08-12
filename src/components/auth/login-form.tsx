@@ -2,50 +2,28 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import {
   Alert,
   Button,
   Form,
   InputGroup,
   Label,
-  ListBox,
-  Select,
   TextField,
 } from "@/components/ui";
-import { businessUnits } from "@/data/units";
 import { demoPassword, demoUsers } from "@/data/users";
-import { authenticate, roleHomePath } from "@/lib/auth";
-import { setSessionCookie } from "@/lib/client-session";
+import { getUnit } from "@/data/units";
+import { roleHomePath } from "@/lib/auth";
 import { appName } from "@/lib/constants";
 import type { AuthUser } from "@/types";
 
-function demoLabel(user: AuthUser) {
-  const unit = user.unit ? businessUnits[user.unit].shortName : "";
-  return unit ? `Director · ${unit}` : "Director";
-}
-
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-5" aria-hidden>
-      <path
-        fill="#EA4335"
-        d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.3 14.6 2.4 12 2.4 6.9 2.4 2.8 6.5 2.8 11.6S6.9 20.8 12 20.8c5.5 0 9.1-3.9 9.1-9.3 0-.6-.1-1.1-.2-1.6H12z"
-      />
-      <path
-        fill="#34A853"
-        d="M3.9 7.5 7.1 9.9C8 7.8 9.9 6.3 12 6.3c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.3 14.6 2.4 12 2.4 8.4 2.4 5.3 4.5 3.9 7.5z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M12 20.8c2.5 0 4.7-.8 6.3-2.3l-3-2.5c-.8.6-1.9 1-3.3 1-2.5 0-4.6-1.7-5.4-4l-3.2 2.5c1.5 3 4.5 5.3 8.6 5.3z"
-      />
-      <path
-        fill="#4285F4"
-        d="M21.1 11.5c0-.6-.1-1.1-.2-1.6H12v3.9h5.5c-.3 1.3-1.1 2.3-2.2 3l3 2.5c1.8-1.6 3-4.1 3-7.8z"
-      />
-    </svg>
-  );
+/** Short, scannable label for a demo account card. */
+function demoAccountLabel(user: AuthUser): string {
+  if (user.role === "senior-director") return "Senior Director";
+  const unit = getUnit(user.unit).shortLabel;
+  return user.role === "director"
+    ? `Director · ${unit}`
+    : `Inspector · ${unit}`;
 }
 
 export function LoginForm() {
@@ -55,14 +33,11 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [demoIndex, setDemoIndex] = useState(0);
 
-  function fillDemo() {
-    const user = demoUsers[demoIndex % demoUsers.length]!;
+  function fillDemo(user: AuthUser) {
     setEmail(user.email);
     setPassword(demoPassword);
     setError(null);
-    setDemoIndex((value) => value + 1);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -71,15 +46,23 @@ export function LoginForm() {
     setPending(true);
 
     try {
-      // Frontend-only demo auth — no API round-trip.
-      const user = authenticate(email, password);
-      if (!user) {
-        setError("Invalid email or password.");
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = (await response.json()) as {
+        user?: AuthUser;
+        error?: string;
+      };
+
+      if (!response.ok || !data.user) {
+        setError(data.error ?? "Unable to sign in.");
         return;
       }
 
-      setSessionCookie(user.id);
-      router.replace(roleHomePath[user.role]);
+      router.replace(roleHomePath[data.user.role]);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -108,8 +91,8 @@ export function LoginForm() {
               Sign in with email
             </h1>
             <p className="mt-1.5 max-w-[340px] text-[13px] leading-snug text-muted sm:text-sm sm:leading-relaxed">
-              Sign in to your assigned RICA unit portal. Directors only see their
-              own unit dashboard.
+              Inspection portals for RICA inspectors, directors and senior
+              directors.
             </p>
           </div>
 
@@ -121,40 +104,6 @@ export function LoginForm() {
                 </Alert.Content>
               </Alert>
             ) : null}
-
-            <Select
-              className="login-page__field w-full"
-              aria-label="Demo account"
-              placeholder="Pick a demo account"
-              onSelectionChange={(key) => {
-                if (key == null) return;
-                const user = demoUsers.find((item) => item.id === String(key));
-                if (!user) return;
-                setEmail(user.email);
-                setPassword(demoPassword);
-                setError(null);
-              }}
-            >
-              <Label className="sr-only">Demo account</Label>
-              <Select.Trigger className="h-11">
-                <Select.Value />
-                <Select.Indicator />
-              </Select.Trigger>
-              <Select.Popover>
-                <ListBox>
-                  {demoUsers.map((user) => (
-                    <ListBox.Item
-                      key={user.id}
-                      id={user.id}
-                      textValue={demoLabel(user)}
-                    >
-                      {demoLabel(user)}
-                      <ListBox.ItemIndicator />
-                    </ListBox.Item>
-                  ))}
-                </ListBox>
-              </Select.Popover>
-            </Select>
 
             <TextField
               isRequired
@@ -234,33 +183,35 @@ export function LoginForm() {
 
           <div className="my-4 flex items-center gap-3 sm:my-5">
             <span className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted">Or sign in with</span>
+            <span className="text-xs text-muted">Tap a demo account</span>
             <span className="h-px flex-1 bg-border" />
           </div>
 
-          <div className="flex justify-center">
-            <button
-              type="button"
-              aria-label="Continue with Google"
-              className="flex h-11 w-full max-w-[280px] items-center justify-center gap-2.5 rounded-2xl border border-border/80 bg-white text-[14px] font-medium text-foreground shadow-sm transition hover:bg-default/60"
-              onClick={fillDemo}
-            >
-              <GoogleIcon />
-              Continue with Google
-            </button>
+          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+            {demoUsers.map((user) => (
+              <button
+                key={user.id}
+                type="button"
+                onClick={() => fillDemo(user)}
+                title={user.email}
+                className="group flex w-full items-center gap-2 rounded-xl border border-border/80 bg-white/70 px-3 py-2 text-left transition-colors duration-150 hover:border-accent hover:bg-accent hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                <span
+                  className="size-1.5 shrink-0 rounded-full bg-accent/40 transition-colors group-hover:bg-accent-foreground"
+                  aria-hidden
+                />
+                <span className="truncate text-[13px] font-medium text-foreground transition-colors group-hover:text-accent-foreground">
+                  {demoAccountLabel(user)}
+                </span>
+              </button>
+            ))}
           </div>
+
+          <p className="mt-3 text-center text-[11px] text-muted">
+            Any account · password <span className="font-medium">password</span>
+          </p>
         </div>
       </div>
-
-      <button
-        type="button"
-        aria-label="Fill next demo account"
-        title="Fill demo credentials"
-        onClick={fillDemo}
-        className="absolute bottom-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-white/90 text-accent shadow-lg ring-1 ring-black/5 backdrop-blur transition hover:scale-105 hover:bg-white sm:bottom-5 sm:right-5 sm:size-11"
-      >
-        <Sparkles className="size-4 sm:size-5" strokeWidth={1.75} />
-      </button>
     </div>
   );
 }

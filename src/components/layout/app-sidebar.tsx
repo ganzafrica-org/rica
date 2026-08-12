@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
   Beaker,
+  Beef,
   Building2,
   ChevronDown,
   ClipboardCheck,
@@ -13,6 +15,8 @@ import {
   FileBarChart,
   Layers,
   MapPin,
+  Store,
+  Truck,
   Users,
 } from "lucide-react";
 import { Tooltip } from "@heroui/react";
@@ -26,6 +30,10 @@ const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
   slaughterhouse: Building2,
   agrochemical: Beaker,
   producer: ClipboardCheck,
+  butchery: Beef,
+  "meat-carrier": Truck,
+  facilities: Store,
+  activity: Activity,
   reports: FileBarChart,
   users: Users,
   building: Building2,
@@ -156,18 +164,17 @@ function NavGroup({
     activeNestedHref,
   );
 
-  useEffect(() => {
-    // Keep accordion in sync with the route: open when a descendant is
-    // active, close when the user navigates elsewhere (e.g. Dashboard).
+  // Keep the accordion in sync with the route: open when a descendant is
+  // active, close when the user navigates elsewhere (e.g. Dashboard).
+  // Adjusting during render rather than in an effect avoids a second pass
+  // where the sidebar shows the previous route's open state.
+  const [syncedPathname, setSyncedPathname] = useState(pathname);
+  if (syncedPathname !== pathname) {
+    setSyncedPathname(pathname);
     if (onOpenChange) onOpenChange(childActive);
     else setOpenUncontrolled(childActive);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- pathname-driven sync
-  }, [pathname]);
-
-  useEffect(() => {
     setOpenNestedHref(activeNestedHref);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- pathname-driven sync
-  }, [pathname]);
+  }
 
   if (collapsed) {
     return (

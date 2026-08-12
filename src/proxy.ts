@@ -21,10 +21,21 @@ export function proxy(request: NextRequest) {
   }
 
   if (!user) {
-    if (isLogin) return NextResponse.next();
+    if (isLogin) {
+      // Drop a stale cookie so a removed/renamed demo user can sign in again.
+      if (userId) {
+        const response = NextResponse.next();
+        response.cookies.delete(SESSION_COOKIE);
+        return response;
+      }
+      return NextResponse.next();
+    }
+
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
+    const response = NextResponse.redirect(loginUrl);
+    if (userId) response.cookies.delete(SESSION_COOKIE);
+    return response;
   }
 
   if (isLogin || pathname === "/") {

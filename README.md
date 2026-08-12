@@ -1,17 +1,48 @@
-# RICA IMS — Director Dashboards
+# RICA IMS — Inspection Dashboards
 
-Demo app for **RICA** (Rwanda Inspectorate, Competition and Consumer Protection Authority) with unit-scoped **Director** portals.
-
-> Inspector and Senior Director portals are owned elsewhere and are not part of this codebase.
+Demo app for **RICA** (Rwanda Inspectorate, Competition and Consumer Protection
+Authority), covering all three actors from the KPI framework: **Inspectors**,
+**Directors**, and the **Senior Director / Executive** view.
 
 ## What’s done
 
-- Glassmorphism **login page** with email/password + demo account picker
-- **Cookie-based demo auth** (frontend session cookie)
-- **Role routing** via `src/proxy.ts` — signed-in users only reach `/director`
-- **Unit scoping** — each Director is assigned to one business unit and only sees that unit’s dashboard data
-- **Director portal** (KPI framework Rev. 2) — Dashboard, Team, unit deep-dives
-- Shared **UI kit** on HeroUI + RICA design tokens
+- Glassmorphism **login page** with email/password and one-tap demo account cards
+- **Cookie-based demo auth** (`/api/auth/login`, `/logout`, `/me`)
+- **Role routing** via `src/proxy.ts` — each user only reaches their own portal
+- **Unit scoping** — inspectors and directors are assigned to one of RICA's five
+  business units and only see that unit's data
+
+### Inspector portal — all 5 units
+
+- `/inspector` renders the signed-in inspector's unit
+- 7-section dashboard per the KPI spec: Workload Summary, Inspection Progress,
+  Assigned Facilities, Compliance Summary, Inspection Activities, Sampling
+  Activities, Future Modules
+- Farm Products' 5 services (Seed, Agrochemical, Slaughterhouse, Butchery,
+  Meat Carrier) act as **filters** across every section
+- Assigned Facilities and Inspection Activities also have full pages
+
+### Director portal — unit-scoped (KPI framework Rev. 2)
+
+- Dashboard, Team, and per-unit deep dives (streams / categories / products)
+- Nested sidebar navigation driven by the director's unit
+- Date-range and province filters
+
+### Senior Director — executive dashboard
+
+- Org-wide across all five units: Executive Highlights, Organizational
+  Performance, Regulatory Coverage, Compliance, Unit Performance, and
+  Director Dashboards
+- **Leaflet + OpenStreetMap** map of registered entities across all 30 Rwandan
+  districts, sized by volume and filterable by category, province and district
+- Per-unit drill-down at `/senior-director/units/[unit]`
+
+> **KPI provenance:** Farm Products follows the source spec exactly. Registration
+> & Licensing is derived from that unit's Director-level sections. Market
+> Surveillance, Import Inspection and Consumer Protection are **plausible
+> placeholders** — the source doc has no forms or datasets for them yet, so the
+> content specs in `src/data/units/` should be replaced once RICA shares the real
+> inspection forms.
 
 ## Technologies
 
@@ -20,6 +51,7 @@ Demo app for **RICA** (Rwanda Inspectorate, Competition and Consumer Protection 
 | Framework | [Next.js](https://nextjs.org) 16 (App Router, Turbopack) |
 | UI | [React](https://react.dev) 19, [HeroUI](https://www.heroui.com) 3, [Tailwind CSS](https://tailwindcss.com) 4 |
 | Charts | [Recharts](https://recharts.org) |
+| Maps | [Leaflet](https://leafletjs.com) + [React Leaflet](https://react-leaflet.js.org), [OpenStreetMap](https://www.openstreetmap.org) tiles |
 | Motion | [Framer Motion](https://www.framer.com/motion/) |
 | Icons | [Lucide React](https://lucide.dev) |
 | Data fetching | [TanStack Query](https://tanstack.com/query) (wired in providers) |
@@ -30,32 +62,40 @@ Demo app for **RICA** (Rwanda Inspectorate, Competition and Consumer Protection 
 ```text
 src/
 ├── app/
-│   ├── (portals)/                 # Authenticated shell
-│   │   └── director/              # /director routes (unit-scoped)
-│   │       ├── page.tsx           # Dashboard
-│   │       ├── team/
-│   │       └── streams/
-│   ├── api/auth/                  # login, logout, me
-│   ├── api/health/                # health check for hosting
-│   └── login/
+│   ├── (portals)/              # Authenticated portals (shared AppShell)
+│   │   ├── inspector/          # Dashboard, facilities, activities, reports
+│   │   ├── director/           # Dashboard, team, unit deep-dives
+│   │   └── senior-director/    # Executive dashboard + units/[unit] drill-down
+│   ├── api/auth/               # login, logout, me
+│   ├── api/health/             # health check for hosting
+│   ├── login/                  # Public login page
+│   └── globals.css             # RICA theme + login styles
 ├── components/
-│   ├── director/                  # All Director UI
-│   ├── shared/                    # Cross-portal pieces
-│   ├── auth/
-│   ├── layout/
-│   ├── motion/
-│   └── ui/
+│   ├── director/               # Director UI
+│   ├── shared/                 # Inspector + executive dashboards, charts, map
+│   ├── auth/ · layout/ · motion/ · ui/
 ├── data/
-│   ├── director/                  # Director KPI mock data
-│   ├── navigation.ts
-│   ├── units.ts
-│   └── users.ts
-├── lib/
+│   ├── director/               # Director KPI mock data
+│   ├── units/                  # Per-unit content specs
+│   ├── generators/             # Seeded inspector + executive data
+│   ├── geo.ts                  # 30 districts, provinces, coordinates
+│   ├── navigation.ts · units.ts · users.ts
+├── lib/                        # Auth, session, seeded RNG, utils
 ├── types/
-└── proxy.ts                       # Auth + role guards
+└── proxy.ts                    # Auth + role guards
 ```
 
 Path alias: `@/*` → `./src/*`
+
+### Deterministic demo data
+
+Inspector and executive numbers come from a **seeded PRNG**
+(`src/lib/seeded-random.ts`) keyed on unit/service/period — never `Math.random()`
+or the clock. Server and client therefore compute identical values, so hydration
+stays clean and figures don't shuffle between refreshes.
+
+`npm run check:data` asserts both generators stay deterministic and internally
+consistent (the KPI totals equal the sum of the table rows they sit above).
 
 ## Getting started
 
@@ -73,28 +113,36 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) — you’ll be redirected to `/login`.
 
-Copy `.env.example` to `.env.local` if you need local overrides (optional for this demo).
-
 ### Scripts
 
 ```bash
-npm run dev      # Development server
-npm run build    # Production build
-npm run start    # Run production build (hosting)
-npm run lint     # ESLint
+npm run dev         # Development server
+npm run build       # Production build
+npm run start       # Run production build (hosting)
+npm run lint        # ESLint
+npm run check:data  # Assert the seeded generators stay deterministic
 ```
 
 ### Demo accounts
 
-Password for all: `Admin@123!`
+Password for all: `password`
 
-| Role | Unit | Email | Lands on |
-| --- | --- | --- | --- |
-| Director | Farm Products (FPU) | `gentilleuwamahoro28@gmail.com` | `/director` |
-| Director | Registration & Licensing (RLU) | `claire.mukamana@gmail.com` | `/director` |
-| Director | Market Surveillance (IMU) | `eric.habimana@gmail.com` | `/director` |
-| Director | Import Inspection (IIU) | `alice.uwimana@gmail.com` | `/director` |
-| Director | Competition & Consumer (CCPU) | `patrick.nsengimana@gmail.com` | `/director` |
+| Role | Unit | Email |
+| --- | --- | --- |
+| Inspector | Farm Products (FPU) | `inspector.farm@rica.gov.rw` |
+| Inspector | Registration & Licensing (RLU) | `inspector.licensing@rica.gov.rw` |
+| Inspector | Market Surveillance (IMU) | `inspector.market@rica.gov.rw` |
+| Inspector | Import Inspection (IIU) | `inspector.imports@rica.gov.rw` |
+| Inspector | Competition & Consumer (CCPU) | `inspector.competition@rica.gov.rw` |
+| Director | Farm Products (FPU) | `director.farm@rica.gov.rw` |
+| Director | Registration & Licensing (RLU) | `director.licensing@rica.gov.rw` |
+| Director | Market Surveillance (IMU) | `director.market@rica.gov.rw` |
+| Director | Import Inspection (IIU) | `director.imports@rica.gov.rw` |
+| Director | Competition & Consumer (CCPU) | `director.competition@rica.gov.rw` |
+| Senior Director | org-wide | `senior.director@rica.gov.rw` |
+
+`inspector@rica.gov.rw` and `director@rica.gov.rw` still work as aliases for the
+Farm Products accounts.
 
 > Auth is **demo-only** (shared password, cookie session). Not for production security.
 
@@ -118,8 +166,6 @@ npm run build
 npm run start
 ```
 
-Set `PORT` if your host requires it (Next.js reads it automatically). Ensure the process can keep cookies (`rica_session`) over HTTPS in production.
-
-### Tip
-
-On login, use the **demo account** dropdown, the sparkle button, or Continue with Google to fill credentials.
+> **Map tiles:** the executive map uses OpenStreetMap's public tile servers,
+> which are fine for a demo but not covered for production traffic. Swap in
+> MapTiler, Stadia, or self-hosted tiles before any public deployment.

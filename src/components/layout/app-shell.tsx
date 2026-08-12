@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { AppNavbar } from "@/components/layout/app-navbar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import type { AuthUser, NavItem } from "@/types";
@@ -43,7 +44,7 @@ export function AppShell({
     <div className="flex min-h-screen bg-background">
       <div
         className={cn(
-          "hidden lg:fixed lg:inset-y-0 lg:flex lg:transition-[width] lg:duration-200",
+          "hidden lg:fixed lg:inset-y-0 lg:flex lg:transition-[width] lg:duration-300 lg:ease-[cubic-bezier(0.22,1,0.36,1)]",
           desktopWidth,
         )}
       >
@@ -54,27 +55,39 @@ export function AppShell({
         />
       </div>
 
-      {mobileOpen ? (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <button
-            type="button"
-            aria-label="Close menu"
-            className="absolute inset-0 bg-black/30"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="absolute inset-y-0 left-0 shadow-xl">
-            <AppSidebar
-              items={navItems}
-              portalLabel={portalLabel}
-              onNavigate={() => setMobileOpen(false)}
+      <AnimatePresence>
+        {mobileOpen ? (
+          <div className="fixed inset-0 z-40 lg:hidden">
+            <motion.button
+              type="button"
+              aria-label="Close menu"
+              className="absolute inset-0 bg-black/30"
+              onClick={() => setMobileOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
             />
+            <motion.div
+              className="absolute inset-y-0 left-0 shadow-xl"
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <AppSidebar
+                items={navItems}
+                portalLabel={portalLabel}
+                onNavigate={() => setMobileOpen(false)}
+              />
+            </motion.div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </AnimatePresence>
 
       <div
         className={cn(
-          "flex min-h-screen flex-1 flex-col transition-[padding] duration-200",
+          "flex min-h-screen flex-1 flex-col transition-[padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
           desktopPadding,
         )}
       >

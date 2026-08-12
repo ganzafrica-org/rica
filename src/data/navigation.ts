@@ -319,8 +319,38 @@ export function directorProductLabel(
 /** @deprecated Prefer directorNavByUnit via getNavForUser */
 export const directorNav = directorNavByUnit.fpu;
 
+/**
+ * Inspector sidebar. Services are filters on the dashboard rather than routes,
+ * so this is the same for every unit.
+ */
+export const inspectorNav: NavItem[] = [
+  { href: "/inspector", label: "Dashboard", icon: "dashboard" },
+  {
+    href: "/inspector/facilities",
+    label: "Assigned Facilities",
+    shortLabel: "Facilities",
+    icon: "facilities",
+  },
+  {
+    href: "/inspector/activities",
+    label: "Inspection Activities",
+    shortLabel: "Activities",
+    icon: "activity",
+  },
+  { href: "/inspector/reports", label: "Reports", icon: "reports" },
+];
+
+export const seniorDirectorNav: NavItem[] = [
+  { href: "/senior-director", label: "Dashboard", icon: "dashboard" },
+  { href: "/senior-director/units", label: "Units", icon: "building" },
+  { href: "/senior-director/inspectors", label: "Inspectors", icon: "users" },
+  { href: "/senior-director/reports", label: "Reports", icon: "reports" },
+];
+
 export const navByRole: Record<UserRole, NavItem[]> = {
+  inspector: inspectorNav,
   director: directorNav,
+  "senior-director": seniorDirectorNav,
 };
 
 export function getDirectorNav(unit?: BusinessUnitKey): NavItem[] {
@@ -331,6 +361,8 @@ export function getNavForUser(user: {
   role: UserRole;
   unit?: BusinessUnitKey;
 }): NavItem[] {
+  if (user.role === "inspector") return inspectorNav;
+  if (user.role === "senior-director") return seniorDirectorNav;
   return getDirectorNav(user.unit);
 }
 
