@@ -82,8 +82,9 @@
   --stream-seed-soft: oklch(0.94 0.04 155);
   --stream-slaughterhouse: oklch(0.55 0.14 250);
   --stream-slaughterhouse-soft: oklch(0.94 0.03 250);
-  --stream-agrochemical: oklch(0.55 0.16 300);
-  --stream-agrochemical-soft: oklch(0.94 0.04 300);
+  /* Clear blue (was purple) — used across charts + agrochemical accents */
+  --stream-agrochemical: oklch(0.55 0.14 230);
+  --stream-agrochemical-soft: oklch(0.94 0.035 230);
   --stream-seed-producer: oklch(0.72 0.14 75);
   --stream-seed-producer-soft: oklch(0.95 0.04 85);
 

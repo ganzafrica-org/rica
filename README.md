@@ -1,20 +1,17 @@
-# RICA — Farm Products & Processes Inspection Unit
+# RICA IMS — Director Dashboards
 
-Inspector portal for **RICA** (Rwanda Inspectorate, Competition and Consumer Protection Authority). Demo app with role-based portals for Inspectors, Directors, and Senior Directors.
+Demo app for **RICA** (Rwanda Inspectorate, Competition and Consumer Protection Authority) with unit-scoped **Director** portals.
+
+> Inspector and Senior Director portals are owned elsewhere and are not part of this codebase.
 
 ## What’s done
 
-- Glassmorphism **login page** with email/password and demo account fill
-- **Cookie-based demo auth** (`/api/auth/login`, `/logout`, `/me`)
-- **Role routing** via `src/proxy.ts` — each user only reaches their portal
-- **Inspector portal** (primary build):
-  - Collapsible sidebar + top navbar with profile dropdown (Profile, Setting, Logout)
-  - Dashboard with KPI cards, Recharts charts, and inspections data table
-  - Regulatory stream pages (Seed Inspection, Slaughterhouse, Agrochemical, Seed Producer)
-  - Reports page
-- **Director** and **Senior Director** portal routes + nav shells (placeholder screens)
-- Shared **UI kit** on HeroUI (buttons, inputs, tables, cards, chips, etc.)
-- RICA design tokens (green accent, stream colors, shell vs body radius)
+- Glassmorphism **login page** with email/password + demo account picker
+- **Cookie-based demo auth** (frontend session cookie)
+- **Role routing** via `src/proxy.ts` — signed-in users only reach `/director`
+- **Unit scoping** — each Director is assigned to one business unit and only sees that unit’s dashboard data
+- **Director portal** (KPI framework Rev. 2) — Dashboard, Team, unit deep-dives
+- Shared **UI kit** on HeroUI + RICA design tokens
 
 ## Technologies
 
@@ -33,27 +30,29 @@ Inspector portal for **RICA** (Rwanda Inspectorate, Competition and Consumer Pro
 ```text
 src/
 ├── app/
-│   ├── (portals)/              # Authenticated portals (shared AppShell)
-│   │   ├── inspector/          # Inspector dashboard, streams, reports
-│   │   ├── director/           # Director portal (placeholder pages)
-│   │   └── senior-director/    # Senior Director portal (placeholder pages)
-│   ├── api/auth/               # login, logout, me
-│   ├── api/health/
-│   ├── login/                  # Public login page
-│   ├── globals.css             # RICA theme + login styles
-│   ├── layout.tsx
-│   └── providers.tsx
+│   ├── (portals)/                 # Authenticated shell
+│   │   └── director/              # /director routes (unit-scoped)
+│   │       ├── page.tsx           # Dashboard
+│   │       ├── team/
+│   │       └── streams/
+│   ├── api/auth/                  # login, logout, me
+│   ├── api/health/                # health check for hosting
+│   └── login/
 ├── components/
-│   ├── auth/                   # AuthProvider, LoginForm
-│   ├── dashboard/              # KPIs, charts, tables, portal home
-│   ├── layout/                 # AppShell, sidebar, navbar, page title
+│   ├── director/                  # All Director UI
+│   ├── shared/                    # Cross-portal pieces
+│   ├── auth/
+│   ├── layout/
 │   ├── motion/
-│   └── ui/                     # HeroUI wrappers + DataTable, StatusChip, …
-├── data/                       # Navigation, dashboard mock data, demo users
-├── hooks/
-├── lib/                        # Auth helpers, session, constants, utils
+│   └── ui/
+├── data/
+│   ├── director/                  # Director KPI mock data
+│   ├── navigation.ts
+│   ├── units.ts
+│   └── users.ts
+├── lib/
 ├── types/
-└── proxy.ts                    # Auth + role guards (Next.js Proxy)
+└── proxy.ts                       # Auth + role guards
 ```
 
 Path alias: `@/*` → `./src/*`
@@ -62,7 +61,7 @@ Path alias: `@/*` → `./src/*`
 
 ### Requirements
 
-- Node.js 20+ (recommended)
+- Node.js 20+
 - npm
 
 ### Install & run
@@ -74,12 +73,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) — you’ll be redirected to `/login`.
 
+Copy `.env.example` to `.env.local` if you need local overrides (optional for this demo).
+
 ### Scripts
 
 ```bash
 npm run dev      # Development server
 npm run build    # Production build
-npm run start    # Run production build
+npm run start    # Run production build (hosting)
 npm run lint     # ESLint
 ```
 
@@ -87,14 +88,38 @@ npm run lint     # ESLint
 
 Password for all: `Admin@123!`
 
-| Role | Email | Lands on |
-| --- | --- | --- |
-| Inspector | `jeannine.uwase@gmail.com` | `/inspector` |
-| Director | `gentilleuwamahoro28@gmail.com` | `/director` |
-| Senior Director | `jannine.uwase@gmail.com` | `/senior-director` |
+| Role | Unit | Email | Lands on |
+| --- | --- | --- | --- |
+| Director | Farm Products (FPU) | `gentilleuwamahoro28@gmail.com` | `/director` |
+| Director | Registration & Licensing (RLU) | `claire.mukamana@gmail.com` | `/director` |
+| Director | Market Surveillance (IMU) | `eric.habimana@gmail.com` | `/director` |
+| Director | Import Inspection (IIU) | `alice.uwimana@gmail.com` | `/director` |
+| Director | Competition & Consumer (CCPU) | `patrick.nsengimana@gmail.com` | `/director` |
 
 > Auth is **demo-only** (shared password, cookie session). Not for production security.
 
+## Deploy / hosting
+
+This app needs a **Node.js** host (App Router + API routes). Static export is not supported.
+
+### Vercel (recommended)
+
+1. Push the repo to GitHub
+2. Import the project in [Vercel](https://vercel.com)
+3. Framework preset: **Next.js** (auto-detected)
+4. Build command: `npm run build` · Output: default
+5. Deploy — health check: `GET /api/health`
+
+### Other Node hosts (Railway, Render, VPS)
+
+```bash
+npm ci
+npm run build
+npm run start
+```
+
+Set `PORT` if your host requires it (Next.js reads it automatically). Ensure the process can keep cookies (`rica_session`) over HTTPS in production.
+
 ### Tip
 
-On the login page, use the sparkle button (bottom-right) or **Continue with Google** to cycle/fill demo credentials quickly.
+On login, use the **demo account** dropdown, the sparkle button, or Continue with Google to fill credentials.

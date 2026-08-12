@@ -2,20 +2,33 @@
 
 import { Label, ListBox, Select } from "@/components/ui";
 import { SurfaceCard } from "@/components/ui/surface-card";
-import { chartPeriodOptions } from "@/data/dashboard";
+
+const chartPeriodOptions = [
+  { id: "2021-2025", label: "2021-2025" },
+  { id: "2024-2028", label: "2024-2028" },
+  { id: "2020-2024", label: "2020-2024" },
+] as const;
 
 type ChartCardProps = {
   title: string;
+  /** @deprecated Kept for callers; subtitles under chart titles are not shown. */
   yLabel?: string;
   caption?: string;
+  className?: string;
   children: React.ReactNode;
 };
 
-export function ChartCard({ title, yLabel, caption, children }: ChartCardProps) {
+/** Chart shell — title only (no subtitle under the title). */
+export function ChartCard({
+  title,
+  caption,
+  className,
+  children,
+}: ChartCardProps) {
   return (
     <SurfaceCard
       title={title}
-      description={yLabel}
+      className={className}
       actions={
         <Select
           className="w-[132px]"

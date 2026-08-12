@@ -9,12 +9,21 @@ import {
   Form,
   InputGroup,
   Label,
+  ListBox,
+  Select,
   TextField,
 } from "@/components/ui";
+import { businessUnits } from "@/data/units";
 import { demoPassword, demoUsers } from "@/data/users";
-import { roleHomePath } from "@/lib/auth";
-import { appName, unitName } from "@/lib/constants";
+import { authenticate, roleHomePath } from "@/lib/auth";
+import { setSessionCookie } from "@/lib/client-session";
+import { appName } from "@/lib/constants";
 import type { AuthUser } from "@/types";
+
+function demoLabel(user: AuthUser) {
+  const unit = user.unit ? businessUnits[user.unit].shortName : "";
+  return unit ? `Director · ${unit}` : "Director";
+}
 
 function GoogleIcon() {
   return (
@@ -62,23 +71,15 @@ export function LoginForm() {
     setPending(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = (await response.json()) as {
-        user?: AuthUser;
-        error?: string;
-      };
-
-      if (!response.ok || !data.user) {
-        setError(data.error ?? "Unable to sign in.");
+      // Frontend-only demo auth — no API round-trip.
+      const user = authenticate(email, password);
+      if (!user) {
+        setError("Invalid email or password.");
         return;
       }
 
-      router.replace(roleHomePath[data.user.role]);
+      setSessionCookie(user.id);
+      router.replace(roleHomePath[user.role]);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -107,8 +108,8 @@ export function LoginForm() {
               Sign in with email
             </h1>
             <p className="mt-1.5 max-w-[340px] text-[13px] leading-snug text-muted sm:text-sm sm:leading-relaxed">
-              Access the {unitName} portals for inspectors, directors, and senior
-              directors.
+              Sign in to your assigned RICA unit portal. Directors only see their
+              own unit dashboard.
             </p>
           </div>
 
@@ -120,6 +121,40 @@ export function LoginForm() {
                 </Alert.Content>
               </Alert>
             ) : null}
+
+            <Select
+              className="login-page__field w-full"
+              aria-label="Demo account"
+              placeholder="Pick a demo account"
+              onSelectionChange={(key) => {
+                if (key == null) return;
+                const user = demoUsers.find((item) => item.id === String(key));
+                if (!user) return;
+                setEmail(user.email);
+                setPassword(demoPassword);
+                setError(null);
+              }}
+            >
+              <Label className="sr-only">Demo account</Label>
+              <Select.Trigger className="h-11">
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox>
+                  {demoUsers.map((user) => (
+                    <ListBox.Item
+                      key={user.id}
+                      id={user.id}
+                      textValue={demoLabel(user)}
+                    >
+                      {demoLabel(user)}
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                  ))}
+                </ListBox>
+              </Select.Popover>
+            </Select>
 
             <TextField
               isRequired

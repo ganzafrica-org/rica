@@ -1,15 +1,6 @@
-import type { Metadata } from "next";
-import { PortalHome } from "@/components/dashboard/portal-home";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Inspectors",
-};
-
-export default function DirectorInspectorsPage() {
-  return (
-    <PortalHome
-      title="Inspectors"
-      description="People under your directorate and their assigned workload."
-    />
-  );
+/** Legacy path — Team moved to /director/team */
+export default function DirectorInspectorsRedirectPage() {
+  redirect("/director/team");
 }

@@ -3,26 +3,49 @@ import type { AuthUser } from "@/types";
 /** Demo accounts for local sign-in. Password: Admin@123! */
 export const demoUsers: AuthUser[] = [
   {
-    id: "inspector-1",
-    email: "jeannine.uwase@gmail.com",
-    name: "Jeannine Uwase",
-    role: "inspector",
-    title: "Inspector · Kigali",
-  },
-  {
-    id: "director-1",
+    id: "director-fpu-1",
     email: "gentilleuwamahoro28@gmail.com",
     name: "Gentille Uwamahoro",
     role: "director",
-    title: "Director · Farm Products Unit",
+    title: "Director · Farm Products",
+    unit: "fpu",
   },
   {
-    id: "senior-1",
-    email: "jannine.uwase@gmail.com",
-    name: "Jannine Uwase",
-    role: "senior-director",
-    title: "Senior Director",
+    id: "director-rlu-1",
+    email: "claire.mukamana@gmail.com",
+    name: "Claire Mukamana",
+    role: "director",
+    title: "Director · Registration & Licensing",
+    unit: "rlu",
+  },
+  {
+    id: "director-imu-1",
+    email: "eric.habimana@gmail.com",
+    name: "Eric Habimana",
+    role: "director",
+    title: "Director · Market Surveillance",
+    unit: "imu",
+  },
+  {
+    id: "director-iiu-1",
+    email: "alice.uwimana@gmail.com",
+    name: "Alice Uwimana",
+    role: "director",
+    title: "Director · Import Inspection",
+    unit: "iiu",
+  },
+  {
+    id: "director-ccpu-1",
+    email: "patrick.nsengimana@gmail.com",
+    name: "Patrick Nsengimana",
+    role: "director",
+    title: "Director · Competition & Consumer",
+    unit: "ccpu",
   },
 ];
 
 export const demoPassword = "Admin@123!";
+
+export const directorDemoUsers = demoUsers.filter(
+  (user) => user.role === "director",
+);

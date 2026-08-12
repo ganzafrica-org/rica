@@ -1,14 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   Beaker,
   Building2,
+  ChevronDown,
   ClipboardCheck,
   Droplets,
   LayoutDashboard,
   FileBarChart,
+  Layers,
+  MapPin,
   Users,
 } from "lucide-react";
 import { Tooltip } from "@heroui/react";
@@ -25,6 +29,8 @@ const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
   reports: FileBarChart,
   users: Users,
   building: Building2,
+  map: MapPin,
+  layers: Layers,
 };
 
 type AppSidebarProps = {
@@ -34,16 +40,42 @@ type AppSidebarProps = {
   onNavigate?: () => void;
 };
 
+function isActivePath(pathname: string, href: string, homeHref: string) {
+  if (href === homeHref) return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function itemOrDescendantActive(
+  item: NavItem,
+  pathname: string,
+  homeHref: string,
+): boolean {
+  if (isActivePath(pathname, item.href, homeHref)) return true;
+  return (item.children ?? []).some((child) =>
+    itemOrDescendantActive(child, pathname, homeHref),
+  );
+}
+
+function flattenNavLeaves(items: NavItem[]): NavItem[] {
+  return items.flatMap((item) =>
+    item.children?.length ? flattenNavLeaves(item.children) : [item],
+  );
+}
+
 function NavLink({
   item,
   active,
   collapsed,
   onNavigate,
+  nested = false,
+  depth = 0,
 }: {
   item: NavItem;
   active: boolean;
   collapsed: boolean;
   onNavigate?: () => void;
+  nested?: boolean;
+  depth?: number;
 }) {
   const Icon = iconMap[item.icon ?? "dashboard"] ?? LayoutDashboard;
 
@@ -55,6 +87,7 @@ function NavLink({
       className={cn(
         "group relative flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors",
         collapsed && "justify-center px-0",
+        nested && !collapsed && (depth >= 2 ? "py-1.5 pl-14" : "py-2 pl-10"),
         active
           ? "bg-accent-soft text-accent-soft-foreground"
           : "text-muted hover:bg-default hover:text-foreground",
@@ -63,6 +96,7 @@ function NavLink({
       <Icon
         className={cn(
           "size-[18px] shrink-0",
+          nested && "size-4",
           active ? "text-accent" : "text-muted group-hover:text-foreground",
         )}
       />
@@ -82,6 +116,183 @@ function NavLink({
         {item.label}
       </Tooltip.Content>
     </Tooltip>
+  );
+}
+
+function NavGroup({
+  item,
+  pathname,
+  homeHref,
+  collapsed,
+  onNavigate,
+  depth = 0,
+  open: openControlled,
+  onOpenChange,
+}: {
+  item: NavItem;
+  pathname: string;
+  homeHref: string;
+  collapsed: boolean;
+  onNavigate?: () => void;
+  depth?: number;
+  /** When set, this group is controlled by a parent accordion. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const children = item.children ?? [];
+  const childActive = itemOrDescendantActive(item, pathname, homeHref);
+  const [openUncontrolled, setOpenUncontrolled] = useState(childActive);
+  const open = openControlled ?? openUncontrolled;
+  const setOpen = onOpenChange ?? setOpenUncontrolled;
+  const Icon = iconMap[item.icon ?? "layers"] ?? Layers;
+
+  const nestedGroups = children.filter((child) => child.children?.length);
+  const expandOnly = nestedGroups.length === 0;
+  const activeNestedHref =
+    nestedGroups.find((child) =>
+      itemOrDescendantActive(child, pathname, homeHref),
+    )?.href ?? null;
+  const [openNestedHref, setOpenNestedHref] = useState<string | null>(
+    activeNestedHref,
+  );
+
+  useEffect(() => {
+    // Keep accordion in sync with the route: open when a descendant is
+    // active, close when the user navigates elsewhere (e.g. Dashboard).
+    if (onOpenChange) onOpenChange(childActive);
+    else setOpenUncontrolled(childActive);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- pathname-driven sync
+  }, [pathname]);
+
+  useEffect(() => {
+    setOpenNestedHref(activeNestedHref);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- pathname-driven sync
+  }, [pathname]);
+
+  if (collapsed) {
+    return (
+      <div className="flex flex-col gap-1">
+        {flattenNavLeaves(children).map((child) => (
+          <NavLink
+            key={child.href}
+            item={child}
+            active={isActivePath(pathname, child.href, homeHref)}
+            collapsed
+            onNavigate={onNavigate}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <div
+        className={cn(
+          "group relative flex w-full items-center text-sm font-medium transition-colors",
+          depth >= 1 && "pl-7",
+          childActive || open
+            ? "bg-accent-soft/60 text-accent-soft-foreground"
+            : "text-muted hover:bg-default hover:text-foreground",
+        )}
+      >
+        {expandOnly ? (
+          <button
+            type="button"
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+            className={cn(
+              "flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left",
+              depth >= 1 && "py-2",
+            )}
+          >
+            <Icon
+              className={cn(
+                "size-[18px] shrink-0",
+                depth >= 1 && "size-4",
+                childActive
+                  ? "text-accent"
+                  : "text-muted group-hover:text-foreground",
+              )}
+            />
+            <span className="min-w-0 flex-1 truncate">{item.label}</span>
+            <ChevronDown
+              className={cn(
+                "size-4 shrink-0 text-muted transition-transform",
+                open && "rotate-180",
+              )}
+            />
+          </button>
+        ) : (
+          <>
+            <Link
+              href={item.href}
+              onClick={onNavigate}
+              className={cn(
+                "flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left",
+                depth >= 1 && "py-2",
+              )}
+            >
+              <Icon
+                className={cn(
+                  "size-[18px] shrink-0",
+                  depth >= 1 && "size-4",
+                  childActive
+                    ? "text-accent"
+                    : "text-muted group-hover:text-foreground",
+                )}
+              />
+              <span className="min-w-0 flex-1 truncate">{item.label}</span>
+            </Link>
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-label={`${open ? "Collapse" : "Expand"} ${item.label}`}
+              onClick={() => setOpen(!open)}
+              className="px-3 py-2.5 text-muted hover:text-foreground"
+            >
+              <ChevronDown
+                className={cn(
+                  "size-4 shrink-0 transition-transform",
+                  open && "rotate-180",
+                )}
+              />
+            </button>
+          </>
+        )}
+      </div>
+      {open ? (
+        <div className="flex flex-col gap-0.5 pb-1">
+          {children.map((child) =>
+            child.children?.length ? (
+              <NavGroup
+                key={child.href}
+                item={child}
+                pathname={pathname}
+                homeHref={homeHref}
+                collapsed={false}
+                onNavigate={onNavigate}
+                depth={depth + 1}
+                open={openNestedHref === child.href}
+                onOpenChange={(nextOpen) =>
+                  setOpenNestedHref(nextOpen ? child.href : null)
+                }
+              />
+            ) : (
+              <NavLink
+                key={child.href}
+                item={child}
+                active={pathname === child.href}
+                collapsed={false}
+                nested
+                depth={depth + 1}
+                onNavigate={onNavigate}
+              />
+            ),
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -129,16 +340,24 @@ export function AppSidebar({
         )}
       >
         {items.map((item) => {
-          const active =
-            item.href === homeHref
-              ? pathname === item.href
-              : pathname === item.href || pathname.startsWith(`${item.href}/`);
+          if (item.children?.length) {
+            return (
+              <NavGroup
+                key={item.href}
+                item={item}
+                pathname={pathname}
+                homeHref={homeHref}
+                collapsed={collapsed}
+                onNavigate={onNavigate}
+              />
+            );
+          }
 
           return (
             <NavLink
               key={item.href}
               item={item}
-              active={active}
+              active={isActivePath(pathname, item.href, homeHref)}
               collapsed={collapsed}
               onNavigate={onNavigate}
             />
