@@ -1,4 +1,4 @@
-/** @deprecated Superseded by ServiceKey. Kept while the legacy stream routes exist. */
+/** @deprecated Superseded by ServiceKey. Kept for the director stream views. */
 export type StreamKey =
   | "seed"
   | "slaughterhouse"
@@ -8,12 +8,10 @@ export type StreamKey =
 export type UserRole = "inspector" | "director" | "senior-director";
 
 /** The five RICA organisational units. */
-export type UnitKey =
-  | "farm-products"
-  | "registration-licensing"
-  | "industries-market-surveillance"
-  | "import-inspection"
-  | "competition-consumer-protection";
+export type BusinessUnitKey = "fpu" | "rlu" | "imu" | "iiu" | "ccpu";
+
+/** Alias used by the inspector and executive dashboards. */
+export type UnitKey = BusinessUnitKey;
 
 /**
  * Services an inspector can work on, across all units. Flat rather than nested
@@ -43,7 +41,8 @@ export type AuthUser = {
   name: string;
   role: UserRole;
   title: string;
-  unit: UnitKey;
+  /** Unit assignment — inspectors and directors only see their own unit. */
+  unit: BusinessUnitKey;
   /** Seeds the default service filter. A preference, not an access restriction. */
   homeService?: ServiceKey;
   /** Alternate sign-in addresses that resolve to this account. */
@@ -62,13 +61,17 @@ export type NavIcon =
   | "activity"
   | "reports"
   | "users"
-  | "building";
+  | "building"
+  | "map"
+  | "layers";
 
 export type NavItem = {
   href: string;
   label: string;
   shortLabel?: string;
   icon?: NavIcon;
+  /** Nested sidebar items (dropdown group). */
+  children?: NavItem[];
 };
 
 /** @deprecated Superseded by ServiceDefinition. */

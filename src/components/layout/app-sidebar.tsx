@@ -1,33 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   Activity,
   Beaker,
   Beef,
   Building2,
+  ChevronDown,
   ClipboardCheck,
   Droplets,
   LayoutDashboard,
   FileBarChart,
+  Layers,
+  MapPin,
   Store,
   Truck,
   Users,
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { appName } from "@/lib/constants";
 import type { NavIcon, NavItem } from "@/types";
-
-/** Labels fade+slide rather than popping as the rail collapses. */
-const labelMotion = {
-  initial: { opacity: 0, x: -6 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -6 },
-  transition: { duration: 0.16, ease: "easeOut" as const },
-};
 
 const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
@@ -42,6 +37,8 @@ const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
   reports: FileBarChart,
   users: Users,
   building: Building2,
+  map: MapPin,
+  layers: Layers,
 };
 
 type AppSidebarProps = {
@@ -51,16 +48,42 @@ type AppSidebarProps = {
   onNavigate?: () => void;
 };
 
+function isActivePath(pathname: string, href: string, homeHref: string) {
+  if (href === homeHref) return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function itemOrDescendantActive(
+  item: NavItem,
+  pathname: string,
+  homeHref: string,
+): boolean {
+  if (isActivePath(pathname, item.href, homeHref)) return true;
+  return (item.children ?? []).some((child) =>
+    itemOrDescendantActive(child, pathname, homeHref),
+  );
+}
+
+function flattenNavLeaves(items: NavItem[]): NavItem[] {
+  return items.flatMap((item) =>
+    item.children?.length ? flattenNavLeaves(item.children) : [item],
+  );
+}
+
 function NavLink({
   item,
   active,
   collapsed,
   onNavigate,
+  nested = false,
+  depth = 0,
 }: {
   item: NavItem;
   active: boolean;
   collapsed: boolean;
   onNavigate?: () => void;
+  nested?: boolean;
+  depth?: number;
 }) {
   const Icon = iconMap[item.icon ?? "dashboard"] ?? LayoutDashboard;
 
@@ -72,6 +95,7 @@ function NavLink({
       className={cn(
         "group relative flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors",
         collapsed && "justify-center px-0",
+        nested && !collapsed && (depth >= 2 ? "py-1.5 pl-14" : "py-2 pl-10"),
         active
           ? "bg-accent-soft text-accent-soft-foreground"
           : "text-muted hover:bg-default hover:text-foreground",
@@ -80,22 +104,13 @@ function NavLink({
       <Icon
         className={cn(
           "size-[18px] shrink-0",
+          nested && "size-4",
           active ? "text-accent" : "text-muted group-hover:text-foreground",
         )}
       />
-      <AnimatePresence initial={false}>
-        {!collapsed ? (
-          <motion.span key="label" className="truncate" {...labelMotion}>
-            {item.label}
-          </motion.span>
-        ) : null}
-      </AnimatePresence>
+      {!collapsed ? <span className="truncate">{item.label}</span> : null}
       {active ? (
-        <motion.span
-          layoutId="nav-active-rail"
-          className="absolute inset-y-2 right-0 w-1 bg-accent"
-          transition={{ duration: 0.2, ease: "easeOut" }}
-        />
+        <span className="absolute inset-y-2 right-0 w-1 bg-accent" />
       ) : null}
     </Link>
   );
@@ -112,6 +127,182 @@ function NavLink({
   );
 }
 
+function NavGroup({
+  item,
+  pathname,
+  homeHref,
+  collapsed,
+  onNavigate,
+  depth = 0,
+  open: openControlled,
+  onOpenChange,
+}: {
+  item: NavItem;
+  pathname: string;
+  homeHref: string;
+  collapsed: boolean;
+  onNavigate?: () => void;
+  depth?: number;
+  /** When set, this group is controlled by a parent accordion. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const children = item.children ?? [];
+  const childActive = itemOrDescendantActive(item, pathname, homeHref);
+  const [openUncontrolled, setOpenUncontrolled] = useState(childActive);
+  const open = openControlled ?? openUncontrolled;
+  const setOpen = onOpenChange ?? setOpenUncontrolled;
+  const Icon = iconMap[item.icon ?? "layers"] ?? Layers;
+
+  const nestedGroups = children.filter((child) => child.children?.length);
+  const expandOnly = nestedGroups.length === 0;
+  const activeNestedHref =
+    nestedGroups.find((child) =>
+      itemOrDescendantActive(child, pathname, homeHref),
+    )?.href ?? null;
+  const [openNestedHref, setOpenNestedHref] = useState<string | null>(
+    activeNestedHref,
+  );
+
+  // Keep the accordion in sync with the route: open when a descendant is
+  // active, close when the user navigates elsewhere (e.g. Dashboard).
+  // Adjusting during render rather than in an effect avoids a second pass
+  // where the sidebar shows the previous route's open state.
+  const [syncedPathname, setSyncedPathname] = useState(pathname);
+  if (syncedPathname !== pathname) {
+    setSyncedPathname(pathname);
+    if (onOpenChange) onOpenChange(childActive);
+    else setOpenUncontrolled(childActive);
+    setOpenNestedHref(activeNestedHref);
+  }
+
+  if (collapsed) {
+    return (
+      <div className="flex flex-col gap-1">
+        {flattenNavLeaves(children).map((child) => (
+          <NavLink
+            key={child.href}
+            item={child}
+            active={isActivePath(pathname, child.href, homeHref)}
+            collapsed
+            onNavigate={onNavigate}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <div
+        className={cn(
+          "group relative flex w-full items-center text-sm font-medium transition-colors",
+          depth >= 1 && "pl-7",
+          childActive || open
+            ? "bg-accent-soft/60 text-accent-soft-foreground"
+            : "text-muted hover:bg-default hover:text-foreground",
+        )}
+      >
+        {expandOnly ? (
+          <button
+            type="button"
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+            className={cn(
+              "flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left",
+              depth >= 1 && "py-2",
+            )}
+          >
+            <Icon
+              className={cn(
+                "size-[18px] shrink-0",
+                depth >= 1 && "size-4",
+                childActive
+                  ? "text-accent"
+                  : "text-muted group-hover:text-foreground",
+              )}
+            />
+            <span className="min-w-0 flex-1 truncate">{item.label}</span>
+            <ChevronDown
+              className={cn(
+                "size-4 shrink-0 text-muted transition-transform",
+                open && "rotate-180",
+              )}
+            />
+          </button>
+        ) : (
+          <>
+            <Link
+              href={item.href}
+              onClick={onNavigate}
+              className={cn(
+                "flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left",
+                depth >= 1 && "py-2",
+              )}
+            >
+              <Icon
+                className={cn(
+                  "size-[18px] shrink-0",
+                  depth >= 1 && "size-4",
+                  childActive
+                    ? "text-accent"
+                    : "text-muted group-hover:text-foreground",
+                )}
+              />
+              <span className="min-w-0 flex-1 truncate">{item.label}</span>
+            </Link>
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-label={`${open ? "Collapse" : "Expand"} ${item.label}`}
+              onClick={() => setOpen(!open)}
+              className="px-3 py-2.5 text-muted hover:text-foreground"
+            >
+              <ChevronDown
+                className={cn(
+                  "size-4 shrink-0 transition-transform",
+                  open && "rotate-180",
+                )}
+              />
+            </button>
+          </>
+        )}
+      </div>
+      {open ? (
+        <div className="flex flex-col gap-0.5 pb-1">
+          {children.map((child) =>
+            child.children?.length ? (
+              <NavGroup
+                key={child.href}
+                item={child}
+                pathname={pathname}
+                homeHref={homeHref}
+                collapsed={false}
+                onNavigate={onNavigate}
+                depth={depth + 1}
+                open={openNestedHref === child.href}
+                onOpenChange={(nextOpen) =>
+                  setOpenNestedHref(nextOpen ? child.href : null)
+                }
+              />
+            ) : (
+              <NavLink
+                key={child.href}
+                item={child}
+                active={pathname === child.href}
+                collapsed={false}
+                nested
+                depth={depth + 1}
+                onNavigate={onNavigate}
+              />
+            ),
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function AppSidebar({
   items,
   portalLabel,
@@ -124,7 +315,7 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-border bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "flex h-full flex-col border-r border-border bg-sidebar transition-[width] duration-200",
         collapsed
           ? "w-[var(--sidebar-width-collapsed)]"
           : "w-[var(--sidebar-width)]",
@@ -139,16 +330,14 @@ export function AppSidebar({
         <div className="flex size-8 shrink-0 items-center justify-center bg-accent text-sm font-bold text-accent-foreground">
           R
         </div>
-        <AnimatePresence initial={false}>
-          {!collapsed ? (
-            <motion.div key="brand" className="min-w-0" {...labelMotion}>
-              <p className="truncate text-sm font-semibold tracking-tight text-foreground">
-                {appName}
-              </p>
-              <p className="truncate text-[11px] text-muted">{portalLabel}</p>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+        {!collapsed ? (
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold tracking-tight text-foreground">
+              {appName}
+            </p>
+            <p className="truncate text-[11px] text-muted">{portalLabel}</p>
+          </div>
+        ) : null}
       </div>
 
       <nav
@@ -158,16 +347,24 @@ export function AppSidebar({
         )}
       >
         {items.map((item) => {
-          const active =
-            item.href === homeHref
-              ? pathname === item.href
-              : pathname === item.href || pathname.startsWith(`${item.href}/`);
+          if (item.children?.length) {
+            return (
+              <NavGroup
+                key={item.href}
+                item={item}
+                pathname={pathname}
+                homeHref={homeHref}
+                collapsed={collapsed}
+                onNavigate={onNavigate}
+              />
+            );
+          }
 
           return (
             <NavLink
               key={item.href}
               item={item}
-              active={active}
+              active={isActivePath(pathname, item.href, homeHref)}
               collapsed={collapsed}
               onNavigate={onNavigate}
             />

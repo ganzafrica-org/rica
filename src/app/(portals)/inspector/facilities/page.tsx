@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { FacilitiesView } from "@/components/dashboard/facilities-view";
+import { FacilitiesView } from "@/components/shared/facilities-view";
 import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {

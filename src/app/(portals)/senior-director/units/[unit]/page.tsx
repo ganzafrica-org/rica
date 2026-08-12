@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { UnitDetailDashboard } from "@/components/dashboard/unit-detail-dashboard";
+import { UnitDetailDashboard } from "@/components/shared/unit-detail-dashboard";
 import { getUnit, isUnitKey, unitList } from "@/data/units";
 import { getSessionUser } from "@/lib/session";
 

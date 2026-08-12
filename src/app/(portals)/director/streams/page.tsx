@@ -1,15 +1,25 @@
 import type { Metadata } from "next";
-import { PortalHome } from "@/components/dashboard/portal-home";
+import { redirect } from "next/navigation";
+import { DirectorStreamsView } from "@/components/director";
+import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Streams",
+  title: "Unit deep-dive",
 };
 
-export default function DirectorStreamsPage() {
-  return (
-    <PortalHome
-      title="Regulatory streams"
-      description="Cross-stream view of inspection activity for your unit."
-    />
-  );
+export default async function DirectorStreamsIndexPage() {
+  const user = await getSessionUser();
+
+  // FPU / RLU / IIU open deep-dives from the sidebar dropdown.
+  if (!user?.unit || user.unit === "fpu") {
+    redirect("/director/streams/seed");
+  }
+  if (user.unit === "rlu") {
+    redirect("/director/streams/seed-producers");
+  }
+  if (user.unit === "iiu") {
+    redirect("/director/streams/food/rice");
+  }
+
+  return <DirectorStreamsView />;
 }

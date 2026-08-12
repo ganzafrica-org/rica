@@ -9,7 +9,7 @@ import type { UnitContentSpec } from "@/data/units/content-spec";
  * and meat carrier by inspection outcome.
  */
 export const farmProductsContent: UnitContentSpec = {
-  unit: "farm-products",
+  unit: "fpu",
   services: {
     seed: {
       facilityPrefixes: [

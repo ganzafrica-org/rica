@@ -10,7 +10,7 @@ import type { UnitContentSpec } from "@/data/units/content-spec";
  * shares the real inspection forms.
  */
 export const industriesMarketSurveillanceContent: UnitContentSpec = {
-  unit: "industries-market-surveillance",
+  unit: "imu",
   services: {
     all: {
       facilityPrefixes: [

@@ -5,11 +5,54 @@ import { industriesMarketSurveillanceContent } from "@/data/units/industries-mar
 import { registrationLicensingContent } from "@/data/units/registration-licensing";
 import type { UnitContentSpec } from "@/data/units/content-spec";
 import type {
+  BusinessUnitKey,
   ServiceDefinition,
   ServiceKey,
   UnitDefinition,
   UnitKey,
 } from "@/types";
+
+export type BusinessUnit = {
+  key: BusinessUnitKey;
+  name: string;
+  shortName: string;
+  code: string;
+};
+
+export const businessUnits: Record<BusinessUnitKey, BusinessUnit> = {
+  fpu: {
+    key: "fpu",
+    name: "Farm Products & Processes Inspection Unit",
+    shortName: "Farm Products",
+    code: "FPU",
+  },
+  rlu: {
+    key: "rlu",
+    name: "Registration & Licensing Unit",
+    shortName: "Registration & Licensing",
+    code: "RLU",
+  },
+  imu: {
+    key: "imu",
+    name: "Industries & Market Surveillance Unit",
+    shortName: "Market Surveillance",
+    code: "IMU",
+  },
+  iiu: {
+    key: "iiu",
+    name: "Import Inspection Unit",
+    shortName: "Import Inspection",
+    code: "IIU",
+  },
+  ccpu: {
+    key: "ccpu",
+    name: "Competition & Consumer Protection Unit",
+    shortName: "Competition & Consumer",
+    code: "CCPU",
+  },
+};
+
+export const businessUnitList = Object.values(businessUnits);
 
 /** Every unit renders the same seven sections unless it says otherwise. */
 const allSections: UnitDefinition["sections"] = [
@@ -70,43 +113,44 @@ const farmProductsServices: ServiceDefinition[] = [
   },
 ];
 
+/** Inspector/executive view of each unit, built on the businessUnits registry. */
 export const unitDefinitions: Record<UnitKey, UnitDefinition> = {
-  "farm-products": {
-    id: "farm-products",
-    label: "Farm Products & Processes Inspection Unit",
-    shortLabel: "Farm Products",
+  fpu: {
+    id: "fpu",
+    label: businessUnits.fpu.name,
+    shortLabel: businessUnits.fpu.shortName,
     icon: "seed",
     services: farmProductsServices,
     sections: allSections,
   },
-  "registration-licensing": {
-    id: "registration-licensing",
-    label: "Registration & Licensing Unit",
-    shortLabel: "Registration & Licensing",
+  rlu: {
+    id: "rlu",
+    label: businessUnits.rlu.name,
+    shortLabel: businessUnits.rlu.shortName,
     icon: "building",
     services: [],
     sections: allSections,
   },
-  "industries-market-surveillance": {
-    id: "industries-market-surveillance",
-    label: "Industries & Market Surveillance Unit",
-    shortLabel: "Market Surveillance",
+  imu: {
+    id: "imu",
+    label: businessUnits.imu.name,
+    shortLabel: businessUnits.imu.shortName,
     icon: "building",
     services: [],
     sections: allSections,
   },
-  "import-inspection": {
-    id: "import-inspection",
-    label: "Import Inspection Unit",
-    shortLabel: "Import Inspection",
+  iiu: {
+    id: "iiu",
+    label: businessUnits.iiu.name,
+    shortLabel: businessUnits.iiu.shortName,
     icon: "building",
     services: [],
     sections: allSections,
   },
-  "competition-consumer-protection": {
-    id: "competition-consumer-protection",
-    label: "Competition & Consumer Protection Unit",
-    shortLabel: "Consumer Protection",
+  ccpu: {
+    id: "ccpu",
+    label: businessUnits.ccpu.name,
+    shortLabel: businessUnits.ccpu.shortName,
     icon: "users",
     services: [],
     sections: allSections,
@@ -117,11 +161,11 @@ export const unitList: UnitDefinition[] = Object.values(unitDefinitions);
 
 /** Content specs, keyed by unit. */
 export const unitContent: Partial<Record<UnitKey, UnitContentSpec>> = {
-  "farm-products": farmProductsContent,
-  "registration-licensing": registrationLicensingContent,
-  "industries-market-surveillance": industriesMarketSurveillanceContent,
-  "import-inspection": importInspectionContent,
-  "competition-consumer-protection": competitionConsumerProtectionContent,
+  fpu: farmProductsContent,
+  rlu: registrationLicensingContent,
+  imu: industriesMarketSurveillanceContent,
+  iiu: importInspectionContent,
+  ccpu: competitionConsumerProtectionContent,
 };
 
 export function getUnit(id: UnitKey): UnitDefinition {

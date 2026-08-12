@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { clearSessionCookie } from "@/lib/client-session";
 import type { AuthUser } from "@/types";
 
 type AuthContextValue = {
@@ -27,9 +28,14 @@ export function AuthProvider({
   const [user, setUser] = useState<AuthUser | null>(initialUser);
 
   const logout = useCallback(async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // Still clear the client cookie and leave the portal.
+    }
+    clearSessionCookie();
     setUser(null);
-    window.location.href = "/login";
+    window.location.assign("/login");
   }, []);
 
   const value = useMemo(

@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { PortalHome } from "@/components/dashboard/portal-home";
+import { PortalPlaceholder } from "@/components/shared/portal-placeholder";
 
 export const metadata: Metadata = {
-  title: "Reports",
+  title: "Senior reports",
 };
 
-export default function SeniorReportsPage() {
+export default function SeniorDirectorReportsPage() {
   return (
-    <PortalHome
-      title="Senior reports"
-      description="Organization-wide reporting and compliance summaries."
+    <PortalPlaceholder
+      title="Reports"
+      description="Organization-wide reporting and compliance summaries"
+      hint="Executive report formats are still to be agreed."
     />
   );
 }

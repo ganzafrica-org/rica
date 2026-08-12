@@ -27,11 +27,11 @@ const DEFAULT_PERIOD = "2026-Q3";
 
 /** One accent per unit — AccentKey happens to have exactly five values. */
 const unitAccents: Record<UnitKey, AccentKey> = {
-  "farm-products": "seed",
-  "registration-licensing": "slaughterhouse",
-  "industries-market-surveillance": "agrochemical",
-  "import-inspection": "seed-producer",
-  "competition-consumer-protection": "accent",
+  fpu: "seed",
+  rlu: "slaughterhouse",
+  imu: "agrochemical",
+  iiu: "seed-producer",
+  ccpu: "accent",
 };
 
 /** Regulated categories the coverage map can be filtered by. */
@@ -411,7 +411,7 @@ export function buildExecutiveDashboard(args?: {
   /* --- Section 4: Compliance --- */
   // Break down by service for Farm Products, otherwise by unit.
   const complianceSource =
-    unit === "farm-products" && unitDefinitions[unit].services.length > 0
+    unit === "fpu" && unitDefinitions[unit].services.length > 0
       ? unitDefinitions[unit].services.map((definition) => ({
           name: definition.shortLabel,
           seed: `${seedPrefix}:svc:${definition.id}`,

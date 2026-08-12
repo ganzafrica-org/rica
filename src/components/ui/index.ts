@@ -28,6 +28,7 @@ export {
 
 export { AppCard } from "./app-card";
 export { DataTable, type DataTableColumn } from "./data-table";
+export { FilterDateRange } from "./date-range-picker";
 export { LinkButton } from "./link-button";
 export { StatusChip } from "./status-chip";
 export { SurfaceCard } from "./surface-card";

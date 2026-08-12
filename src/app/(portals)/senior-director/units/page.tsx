@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { UnitsIndex } from "@/components/dashboard/units-index";
+import { UnitsIndex } from "@/components/shared/units-index";
 import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {

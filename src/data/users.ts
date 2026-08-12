@@ -2,64 +2,106 @@ import type { AuthUser } from "@/types";
 
 /** Demo accounts for local sign-in. Password: password */
 export const demoUsers: AuthUser[] = [
+  // Inspectors — one per unit
   {
-    id: "inspector-farm",
+    id: "inspector-fpu",
     email: "inspector.farm@rica.gov.rw",
     aliases: ["inspector@rica.gov.rw"],
     name: "Jeannine Uwase",
     role: "inspector",
     title: "Inspector · Farm Products",
-    unit: "farm-products",
+    unit: "fpu",
     homeService: "seed",
   },
   {
-    id: "inspector-licensing",
+    id: "inspector-rlu",
     email: "inspector.licensing@rica.gov.rw",
     name: "Eric Habimana",
     role: "inspector",
     title: "Inspector · Registration & Licensing",
-    unit: "registration-licensing",
+    unit: "rlu",
   },
   {
-    id: "inspector-market",
+    id: "inspector-imu",
     email: "inspector.market@rica.gov.rw",
     name: "Claudine Mukamana",
     role: "inspector",
     title: "Inspector · Market Surveillance",
-    unit: "industries-market-surveillance",
+    unit: "imu",
   },
   {
-    id: "inspector-imports",
+    id: "inspector-iiu",
     email: "inspector.imports@rica.gov.rw",
     name: "Patrick Nkurunziza",
     role: "inspector",
     title: "Inspector · Import Inspection",
-    unit: "import-inspection",
+    unit: "iiu",
   },
   {
-    id: "inspector-competition",
+    id: "inspector-ccpu",
     email: "inspector.competition@rica.gov.rw",
     name: "Aline Ingabire",
     role: "inspector",
-    title: "Inspector · Consumer Protection",
-    unit: "competition-consumer-protection",
+    title: "Inspector · Competition & Consumer",
+    unit: "ccpu",
   },
+
+  // Directors — one per unit
   {
-    id: "director-1",
-    email: "director@rica.gov.rw",
+    id: "director-fpu-1",
+    email: "director.farm@rica.gov.rw",
+    aliases: ["director@rica.gov.rw"],
     name: "Gentille Uwamahoro",
     role: "director",
-    title: "Director · Farm Products Unit",
-    unit: "farm-products",
+    title: "Director · Farm Products",
+    unit: "fpu",
   },
+  {
+    id: "director-rlu-1",
+    email: "director.licensing@rica.gov.rw",
+    name: "Claire Mukamana",
+    role: "director",
+    title: "Director · Registration & Licensing",
+    unit: "rlu",
+  },
+  {
+    id: "director-imu-1",
+    email: "director.market@rica.gov.rw",
+    name: "Eric Habimana",
+    role: "director",
+    title: "Director · Market Surveillance",
+    unit: "imu",
+  },
+  {
+    id: "director-iiu-1",
+    email: "director.imports@rica.gov.rw",
+    name: "Alice Uwimana",
+    role: "director",
+    title: "Director · Import Inspection",
+    unit: "iiu",
+  },
+  {
+    id: "director-ccpu-1",
+    email: "director.competition@rica.gov.rw",
+    name: "Patrick Nsengimana",
+    role: "director",
+    title: "Director · Competition & Consumer",
+    unit: "ccpu",
+  },
+
+  // Senior director — org-wide, so the unit is nominal.
   {
     id: "senior-1",
     email: "senior.director@rica.gov.rw",
     name: "Jannine Uwase",
     role: "senior-director",
     title: "Senior Director",
-    unit: "farm-products",
+    unit: "fpu",
   },
 ];
 
 export const demoPassword = "password";
+
+export const directorDemoUsers = demoUsers.filter(
+  (user) => user.role === "director",
+);

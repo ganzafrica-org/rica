@@ -9,7 +9,7 @@ import type { UnitContentSpec } from "@/data/units/content-spec";
  * replaced once the real forms are shared.
  */
 export const importInspectionContent: UnitContentSpec = {
-  unit: "import-inspection",
+  unit: "iiu",
   services: {
     all: {
       facilityPrefixes: [

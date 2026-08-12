@@ -1,15 +1,6 @@
-import type { Metadata } from "next";
-import { PortalHome } from "@/components/dashboard/portal-home";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Reports",
-};
-
-export default function DirectorReportsPage() {
-  return (
-    <PortalHome
-      title="Director reports"
-      description="Summaries and exports for director-level review."
-    />
-  );
+/** Removed — not a Director KPI framework page. */
+export default function DirectorReportsRedirectPage() {
+  redirect("/director");
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ExecutiveDashboard } from "@/components/dashboard/executive-dashboard";
+import { ExecutiveDashboard } from "@/components/shared/executive-dashboard";
 import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ActivitiesView } from "@/components/dashboard/activities-view";
+import { ActivitiesView } from "@/components/shared/activities-view";
 import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {

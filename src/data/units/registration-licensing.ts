@@ -10,7 +10,7 @@ import type { UnitContentSpec } from "@/data/units/content-spec";
  * licensed operators rather than running field inspections.
  */
 export const registrationLicensingContent: UnitContentSpec = {
-  unit: "registration-licensing",
+  unit: "rlu",
   services: {
     all: {
       facilityPrefixes: [

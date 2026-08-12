@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { PortalHome } from "@/components/dashboard/portal-home";
+import { PortalPlaceholder } from "@/components/shared/portal-placeholder";
 
 export const metadata: Metadata = {
   title: "Inspectors",
 };
 
-export default function SeniorInspectorsPage() {
+export default function SeniorDirectorInspectorsPage() {
   return (
-    <PortalHome
+    <PortalPlaceholder
       title="Inspectors"
-      description="Inspectors across units under senior oversight."
+      description="Inspectors across all units under senior oversight"
+      hint="Needs an inspector roster before this can show real data."
     />
   );
 }

@@ -9,7 +9,7 @@ import type { UnitContentSpec } from "@/data/units/content-spec";
  * cases — and should be replaced once the real processes are shared.
  */
 export const competitionConsumerProtectionContent: UnitContentSpec = {
-  unit: "competition-consumer-protection",
+  unit: "ccpu",
   services: {
     all: {
       facilityPrefixes: [
