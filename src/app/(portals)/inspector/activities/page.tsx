@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { InspectorDashboard } from "@/components/dashboard/inspector-dashboard";
+import { ActivitiesView } from "@/components/dashboard/activities-view";
 import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Inspector Dashboard",
+  title: "Inspection Activities",
 };
 
-export default async function InspectorDashboardPage() {
+export default async function InspectorActivitiesPage() {
   const user = await getSessionUser();
 
   if (!user) {
@@ -15,7 +15,7 @@ export default async function InspectorDashboardPage() {
   }
 
   return (
-    <InspectorDashboard
+    <ActivitiesView
       unitId={user.unit}
       initialService={user.homeService ?? "all"}
     />

@@ -1,8 +1,7 @@
 import { cn } from "@/lib/utils";
-import { unitName } from "@/lib/constants";
 
 type PageTitleProps = {
-  title?: string;
+  title: string;
   description?: string;
   className?: string;
   actions?: React.ReactNode;
@@ -10,7 +9,7 @@ type PageTitleProps = {
 
 /** Reusable white title bar for page/section headings. */
 export function PageTitle({
-  title = unitName,
+  title,
   description,
   className,
   actions,

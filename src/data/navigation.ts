@@ -1,30 +1,22 @@
-import type { NavItem, StreamNavItem, UserRole } from "@/types";
+import type { AuthUser, NavItem, StreamNavItem, UserRole } from "@/types";
 
+/**
+ * Services are filters on the dashboard rather than routes, so the inspector
+ * sidebar is the same for every unit.
+ */
 export const inspectorNav: NavItem[] = [
   { href: "/inspector", label: "Dashboard", icon: "dashboard" },
   {
-    href: "/inspector/streams/seed-inspection",
-    label: "Seed Inspection",
-    shortLabel: "Seed",
-    icon: "seed",
+    href: "/inspector/facilities",
+    label: "Assigned Facilities",
+    shortLabel: "Facilities",
+    icon: "facilities",
   },
   {
-    href: "/inspector/streams/slaughterhouse",
-    label: "Slaughterhouse",
-    shortLabel: "Slaughter",
-    icon: "slaughterhouse",
-  },
-  {
-    href: "/inspector/streams/agrochemical",
-    label: "Agrochemical",
-    shortLabel: "Agrochem",
-    icon: "agrochemical",
-  },
-  {
-    href: "/inspector/streams/seed-producer",
-    label: "Seed Producer",
-    shortLabel: "Producer",
-    icon: "producer",
+    href: "/inspector/activities",
+    label: "Inspection Activities",
+    shortLabel: "Activities",
+    icon: "activity",
   },
   { href: "/inspector/reports", label: "Reports", icon: "reports" },
 ];
@@ -39,8 +31,8 @@ export const directorNav: NavItem[] = [
 export const seniorDirectorNav: NavItem[] = [
   { href: "/senior-director", label: "Dashboard", icon: "dashboard" },
   {
-    href: "/senior-director/directors",
-    label: "Directors",
+    href: "/senior-director/units",
+    label: "Units",
     icon: "building",
   },
   {
@@ -57,9 +49,15 @@ export const navByRole: Record<UserRole, NavItem[]> = {
   "senior-director": seniorDirectorNav,
 };
 
-/** @deprecated Prefer role-specific nav via navByRole */
+/** Nav for the signed-in user. Unit-aware once units differ in structure. */
+export function navForUser(user: AuthUser): NavItem[] {
+  return navByRole[user.role];
+}
+
+/** @deprecated Prefer role-specific nav via navForUser */
 export const mainNav = inspectorNav;
 
+/** @deprecated Superseded by the unit registry in `@/data/units`. */
 export const streams: StreamNavItem[] = [
   {
     id: "seed",

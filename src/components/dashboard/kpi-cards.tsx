@@ -5,12 +5,15 @@ import {
   Building2,
   ClipboardCheck,
   Droplets,
+  ShieldCheck,
 } from "lucide-react";
 import { SurfaceCard } from "@/components/ui/surface-card";
-import { kpiCards } from "@/data/dashboard";
+import { kpiCards as defaultCards } from "@/data/dashboard";
 import { cn } from "@/lib/utils";
+import type { AccentKey } from "@/types";
+import type { KpiCard } from "@/types/dashboard";
 
-const toneStyles = {
+const toneStyles: Record<AccentKey, { icon: typeof Droplets; wrap: string }> = {
   seed: {
     icon: Droplets,
     wrap: "bg-stream-seed-soft text-stream-seed",
@@ -27,13 +30,28 @@ const toneStyles = {
     icon: ClipboardCheck,
     wrap: "bg-stream-seed-producer-soft text-stream-seed-producer",
   },
-} as const;
+  accent: {
+    icon: ShieldCheck,
+    wrap: "bg-accent-soft text-accent",
+  },
+};
 
-export function KpiCards() {
+type KpiCardsProps = {
+  cards?: readonly KpiCard[];
+  className?: string;
+};
+
+export function KpiCards({ cards = defaultCards, className }: KpiCardsProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {kpiCards.map((card) => {
-        const tone = toneStyles[card.tone];
+    <div
+      className={cn(
+        "grid gap-4 sm:grid-cols-2 xl:grid-cols-4",
+        cards.length === 3 && "xl:grid-cols-3",
+        className,
+      )}
+    >
+      {cards.map((card) => {
+        const tone = toneStyles[card.tone] ?? toneStyles.accent;
         const Icon = tone.icon;
 
         return (

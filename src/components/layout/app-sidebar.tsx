@@ -3,18 +3,31 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
   Beaker,
+  Beef,
   Building2,
   ClipboardCheck,
   Droplets,
   LayoutDashboard,
   FileBarChart,
+  Store,
+  Truck,
   Users,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { appName } from "@/lib/constants";
 import type { NavIcon, NavItem } from "@/types";
+
+/** Labels fade+slide rather than popping as the rail collapses. */
+const labelMotion = {
+  initial: { opacity: 0, x: -6 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -6 },
+  transition: { duration: 0.16, ease: "easeOut" as const },
+};
 
 const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
@@ -22,6 +35,10 @@ const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
   slaughterhouse: Building2,
   agrochemical: Beaker,
   producer: ClipboardCheck,
+  butchery: Beef,
+  "meat-carrier": Truck,
+  facilities: Store,
+  activity: Activity,
   reports: FileBarChart,
   users: Users,
   building: Building2,
@@ -66,9 +83,19 @@ function NavLink({
           active ? "text-accent" : "text-muted group-hover:text-foreground",
         )}
       />
-      {!collapsed ? <span className="truncate">{item.label}</span> : null}
+      <AnimatePresence initial={false}>
+        {!collapsed ? (
+          <motion.span key="label" className="truncate" {...labelMotion}>
+            {item.label}
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
       {active ? (
-        <span className="absolute inset-y-2 right-0 w-1 bg-accent" />
+        <motion.span
+          layoutId="nav-active-rail"
+          className="absolute inset-y-2 right-0 w-1 bg-accent"
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        />
       ) : null}
     </Link>
   );
@@ -97,7 +124,7 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-border bg-sidebar transition-[width] duration-200",
+        "flex h-full flex-col border-r border-border bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
         collapsed
           ? "w-[var(--sidebar-width-collapsed)]"
           : "w-[var(--sidebar-width)]",
@@ -112,14 +139,16 @@ export function AppSidebar({
         <div className="flex size-8 shrink-0 items-center justify-center bg-accent text-sm font-bold text-accent-foreground">
           R
         </div>
-        {!collapsed ? (
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold tracking-tight text-foreground">
-              {appName}
-            </p>
-            <p className="truncate text-[11px] text-muted">{portalLabel}</p>
-          </div>
-        ) : null}
+        <AnimatePresence initial={false}>
+          {!collapsed ? (
+            <motion.div key="brand" className="min-w-0" {...labelMotion}>
+              <p className="truncate text-sm font-semibold tracking-tight text-foreground">
+                {appName}
+              </p>
+              <p className="truncate text-[11px] text-muted">{portalLabel}</p>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
 
       <nav

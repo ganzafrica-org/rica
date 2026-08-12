@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { AuthProvider } from "@/components/auth/auth-provider";
-import { navByRole } from "@/data/navigation";
-import { rolePortalLabel } from "@/lib/auth";
+import { navForUser } from "@/data/navigation";
+import { unitPortalLabel } from "@/lib/auth";
 import { getSessionUser } from "@/lib/session";
 
 export default async function PortalsLayout({
@@ -18,8 +18,8 @@ export default async function PortalsLayout({
   return (
     <AuthProvider user={user}>
       <AppShell
-        navItems={navByRole[user.role]}
-        portalLabel={rolePortalLabel[user.role]}
+        navItems={navForUser(user)}
+        portalLabel={unitPortalLabel(user)}
         user={user}
       >
         {children}

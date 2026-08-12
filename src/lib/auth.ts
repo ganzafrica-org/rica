@@ -1,4 +1,5 @@
 import { demoPassword, demoUsers } from "@/data/users";
+import { getUnit } from "@/data/units";
 import type { AuthUser, UserRole } from "@/types";
 
 export const SESSION_COOKIE = "rica_session";
@@ -27,7 +28,23 @@ export function getUserById(id: string): AuthUser | undefined {
 
 export function getUserByEmail(email: string): AuthUser | undefined {
   const normalized = email.trim().toLowerCase();
-  return demoUsers.find((user) => user.email.toLowerCase() === normalized);
+  return demoUsers.find(
+    (user) =>
+      user.email.toLowerCase() === normalized ||
+      user.aliases?.some((alias) => alias.toLowerCase() === normalized),
+  );
+}
+
+/** Sidebar label — inspectors and directors are identified by their unit. */
+export function unitPortalLabel(user: AuthUser): string {
+  if (user.role === "senior-director") {
+    return rolePortalLabel[user.role];
+  }
+
+  const unit = getUnit(user.unit);
+  const roleWord = user.role === "director" ? "Director" : "Inspector";
+
+  return `${roleWord} · ${unit.shortLabel}`;
 }
 
 export function authenticate(

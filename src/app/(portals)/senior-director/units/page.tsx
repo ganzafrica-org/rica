@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ExecutiveDashboard } from "@/components/dashboard/executive-dashboard";
+import { UnitsIndex } from "@/components/dashboard/units-index";
 import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Executive Dashboard",
+  title: "Units",
 };
 
-export default async function SeniorDirectorDashboardPage() {
+export default async function SeniorDirectorUnitsPage() {
   const user = await getSessionUser();
 
   if (!user) {
     redirect("/login");
   }
 
-  return <ExecutiveDashboard />;
+  return <UnitsIndex />;
 }
