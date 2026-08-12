@@ -1,24 +1,27 @@
 import { demoPassword, demoUsers } from "@/data/users";
+import { businessUnits } from "@/data/units";
 import type { AuthUser, UserRole } from "@/types";
 
 export const SESSION_COOKIE = "rica_session";
 
 export const roleHomePath: Record<UserRole, string> = {
-  inspector: "/inspector",
   director: "/director",
-  "senior-director": "/senior-director",
 };
 
 export const rolePortalLabel: Record<UserRole, string> = {
-  inspector: "Inspector portal",
   director: "Director portal",
-  "senior-director": "Senior Director portal",
 };
 
+export function getPortalLabel(user: AuthUser): string {
+  if (user.unit) {
+    const unit = businessUnits[user.unit];
+    return `Director · ${unit.shortName}`;
+  }
+  return rolePortalLabel[user.role];
+}
+
 export const rolePathPrefix: Record<UserRole, string> = {
-  inspector: "/inspector",
   director: "/director",
-  "senior-director": "/senior-director",
 };
 
 export function getUserById(id: string): AuthUser | undefined {
@@ -39,17 +42,8 @@ export function authenticate(
 }
 
 export function getRoleFromPath(pathname: string): UserRole | null {
-  if (pathname === "/inspector" || pathname.startsWith("/inspector/")) {
-    return "inspector";
-  }
   if (pathname === "/director" || pathname.startsWith("/director/")) {
     return "director";
-  }
-  if (
-    pathname === "/senior-director" ||
-    pathname.startsWith("/senior-director/")
-  ) {
-    return "senior-director";
   }
   return null;
 }

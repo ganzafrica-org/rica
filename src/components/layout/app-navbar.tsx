@@ -110,7 +110,7 @@ export function AppNavbar({
         >
           <Dropdown.Menu
             onAction={(key) => {
-              if (key === "logout") {
+              if (String(key) === "logout") {
                 void logout();
               }
             }}

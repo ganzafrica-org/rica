@@ -4,7 +4,9 @@ export type StreamKey =
   | "agrochemical"
   | "seed-producer";
 
-export type UserRole = "inspector" | "director" | "senior-director";
+export type BusinessUnitKey = "fpu" | "rlu" | "imu" | "iiu" | "ccpu";
+
+export type UserRole = "director";
 
 export type AuthUser = {
   id: string;
@@ -12,6 +14,8 @@ export type AuthUser = {
   name: string;
   role: UserRole;
   title: string;
+  /** Unit assignment — directors only see their unit. */
+  unit?: BusinessUnitKey;
 };
 
 export type NavIcon =
@@ -22,17 +26,15 @@ export type NavIcon =
   | "producer"
   | "reports"
   | "users"
-  | "building";
+  | "building"
+  | "map"
+  | "layers";
 
 export type NavItem = {
   href: string;
   label: string;
   shortLabel?: string;
   icon?: NavIcon;
-};
-
-export type StreamNavItem = NavItem & {
-  id: StreamKey;
-  formCode: string;
-  description: string;
+  /** Nested sidebar items (dropdown group). */
+  children?: NavItem[];
 };
