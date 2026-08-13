@@ -165,7 +165,9 @@ export function DirectorStreamsView({
     return items;
   });
 
+  // RLU already has a Geographic distribution bar chart — skip the map duplicate.
   const showMap =
+    unitKey !== "rlu" &&
     filtered.mapProvinces &&
     filtered.mapProvinces.length > 0 &&
     !streamId;
@@ -176,7 +178,7 @@ export function DirectorStreamsView({
         key="province-map"
         title="Geographic distribution"
         data={filtered.mapProvinces!}
-        valueSuffix={unitKey === "rlu" ? "operators" : "outlets"}
+        valueSuffix="outlets"
       />,
     );
   }
