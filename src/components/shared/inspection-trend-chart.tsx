@@ -31,7 +31,6 @@ export function InspectionTrendChart({ trend }: InspectionTrendChartProps) {
   return (
     <ChartCard
       title="Inspection Trend"
-      yLabel="Completed vs pending"
       actions={
         <div className="flex shrink-0 items-center gap-0.5 rounded-full border border-border bg-default/40 p-0.5">
           {granularities.map((option) => (

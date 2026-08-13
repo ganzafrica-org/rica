@@ -18,7 +18,7 @@ export function FacilitiesView({
   unitId,
   initialService = "all",
 }: FacilitiesViewProps) {
-  const unit = getUnit(unitId);
+  const services = getUnit(unitId).services;
   const [service, setService] = useState<ServiceKey | "all">(initialService);
 
   const data = useMemo(
@@ -28,13 +28,10 @@ export function FacilitiesView({
 
   return (
     <PageTransition className="space-y-6">
-      <PageTitle
-        title="Assigned Facilities"
-        description={`Facilities assigned to you across ${unit.shortLabel}`}
-      />
+      <PageTitle title="Assigned Facilities" />
 
       <ServiceFilter
-        services={unit.services}
+        services={services}
         value={service}
         onChange={setService}
       />
@@ -43,7 +40,6 @@ export function FacilitiesView({
         <AssignedFacilitiesTable
           facilities={data.facilities}
           title={`${data.facilities.length} facilities`}
-          description="Name, classification, district and registration status"
         />
       </ContentSwap>
     </PageTransition>

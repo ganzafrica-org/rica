@@ -62,7 +62,7 @@ export function ChartCard({
       className={className}
       actions={actions ?? (showPeriodSelect ? periodSelect : null)}
     >
-      <div className="space-y-1">
+      <div className="flex min-h-0 flex-1 flex-col space-y-1">
         {children}
         {caption ? <p className="rica-caption text-right">{caption}</p> : null}
       </div>

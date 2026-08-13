@@ -25,12 +25,14 @@ type ExecutiveTrendChartProps = {
   trend: Record<TrendGranularity, ExecutiveTrendPoint[]>;
   title?: string;
   yLabel?: string;
+  className?: string;
 };
 
 export function ExecutiveTrendChart({
   trend,
   title = "Organizational Trend",
-  yLabel = "Received vs approved",
+  yLabel,
+  className,
 }: ExecutiveTrendChartProps) {
   const [granularity, setGranularity] = useState<TrendGranularity>("monthly");
 
@@ -38,6 +40,7 @@ export function ExecutiveTrendChart({
     <ChartCard
       title={title}
       yLabel={yLabel}
+      className={className}
       actions={
         <div className="flex shrink-0 items-center gap-0.5 rounded-full border border-border bg-default/40 p-0.5">
           {granularities.map((option) => (
@@ -59,23 +62,24 @@ export function ExecutiveTrendChart({
         </div>
       }
     >
-      <div className="h-52 w-full">
+      <div className="min-h-40 w-full flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={trend[granularity]}
-            margin={{ top: 8, right: 12, left: 4, bottom: 4 }}
+            margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
           >
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="period"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "var(--muted)", fontSize: 12 }}
+              tick={{ fill: "var(--muted)", fontSize: 11 }}
             />
             <YAxis
+              width={36}
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "var(--muted)", fontSize: 12 }}
+              tick={{ fill: "var(--muted)", fontSize: 11 }}
             />
             <Tooltip
               contentStyle={{
@@ -86,7 +90,7 @@ export function ExecutiveTrendChart({
             />
             <Legend
               verticalAlign="bottom"
-              height={28}
+              height={22}
               iconType="circle"
               wrapperStyle={{ fontSize: 11, color: "var(--muted)" }}
             />
@@ -96,8 +100,8 @@ export function ExecutiveTrendChart({
               name="Received"
               stroke="var(--stream-slaughterhouse)"
               strokeWidth={2}
-              dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
-              activeDot={{ r: 5 }}
+              dot={{ r: 2, strokeWidth: 2, fill: "#fff" }}
+              activeDot={{ r: 4 }}
             />
             <Line
               type="monotone"
@@ -105,8 +109,8 @@ export function ExecutiveTrendChart({
               name="Approved"
               stroke="var(--stream-seed)"
               strokeWidth={2}
-              dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
-              activeDot={{ r: 5 }}
+              dot={{ r: 2, strokeWidth: 2, fill: "#fff" }}
+              activeDot={{ r: 4 }}
             />
           </LineChart>
         </ResponsiveContainer>

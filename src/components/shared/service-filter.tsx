@@ -8,19 +8,22 @@ type ServiceFilterProps = {
   value: ServiceKey | "all";
   onChange: (value: ServiceKey | "all") => void;
   className?: string;
+  /** Optional muted label on the left of the tab bar. */
+  label?: string;
 };
 
-/** Renders nothing for units that have no service split. */
+/** Underline tab bar for service filters on Inspector pages. */
 export function ServiceFilter({
   services,
   value,
   onChange,
   className,
+  label,
 }: ServiceFilterProps) {
   if (services.length === 0) return null;
 
   const options: { id: ServiceKey | "all"; label: string }[] = [
-    { id: "all", label: "All services" },
+    { id: "all", label: "All" },
     ...services.map((service) => ({
       id: service.id,
       label: service.shortLabel,
@@ -29,10 +32,19 @@ export function ServiceFilter({
 
   return (
     <div
-      className={cn("flex flex-wrap items-center gap-2", className)}
-      role="group"
+      className={cn(
+        "flex min-w-0 items-stretch gap-6 overflow-x-auto border border-border bg-surface px-5 shadow-sm",
+        className,
+      )}
+      role="tablist"
       aria-label="Filter by service"
     >
+      {label ? (
+        <span className="flex shrink-0 items-center py-3.5 text-sm font-medium text-muted">
+          {label}
+        </span>
+      ) : null}
+
       {options.map((option) => {
         const isActive = option.id === value;
 
@@ -40,14 +52,15 @@ export function ServiceFilter({
           <button
             key={option.id}
             type="button"
+            role="tab"
+            aria-selected={isActive}
             onClick={() => onChange(option.id)}
-            aria-pressed={isActive}
             className={cn(
-              "rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+              "relative shrink-0 py-3.5 text-sm font-medium transition-colors",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
               isActive
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border bg-surface text-muted hover:border-accent/50 hover:text-foreground",
+                ? "text-accent after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:bg-accent"
+                : "text-foreground hover:text-accent",
             )}
           >
             {option.label}

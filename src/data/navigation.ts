@@ -342,7 +342,43 @@ export const inspectorNav: NavItem[] = [
 
 export const seniorDirectorNav: NavItem[] = [
   { href: "/senior-director", label: "Dashboard", icon: "dashboard" },
-  { href: "/senior-director/units", label: "Units", icon: "building" },
+  {
+    href: "/senior-director/units",
+    label: "Units",
+    icon: "building",
+    children: [
+      {
+        href: "/senior-director/units/fpu",
+        label: "Farm Products",
+        shortLabel: "FPU",
+        icon: "seed",
+      },
+      {
+        href: "/senior-director/units/rlu",
+        label: "Registration & Licensing",
+        shortLabel: "RLU",
+        icon: "building",
+      },
+      {
+        href: "/senior-director/units/imu",
+        label: "Market Surveillance",
+        shortLabel: "IMU",
+        icon: "building",
+      },
+      {
+        href: "/senior-director/units/iiu",
+        label: "Import Inspection",
+        shortLabel: "IIU",
+        icon: "building",
+      },
+      {
+        href: "/senior-director/units/ccpu",
+        label: "Competition & Consumer",
+        shortLabel: "CCPU",
+        icon: "users",
+      },
+    ],
+  },
   { href: "/senior-director/inspectors", label: "Inspectors", icon: "users" },
   { href: "/senior-director/reports", label: "Reports", icon: "reports" },
 ];

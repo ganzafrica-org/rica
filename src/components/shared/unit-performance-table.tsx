@@ -9,11 +9,13 @@ import type { UnitPerformanceRow } from "@/types/dashboard";
 type UnitPerformanceTableProps = {
   rows: readonly UnitPerformanceRow[];
   className?: string;
+  title?: string;
 };
 
 export function UnitPerformanceTable({
   rows,
   className,
+  title = "Unit Performance",
 }: UnitPerformanceTableProps) {
   // Columns are built inside the component so this stays reusable.
   const columns: DataTableColumn<UnitPerformanceRow>[] = [
@@ -74,11 +76,7 @@ export function UnitPerformanceTable({
   ];
 
   return (
-    <SurfaceCard
-      title="Unit Performance"
-      description="How RICA's units compare over the selected period"
-      className={className}
-    >
+    <SurfaceCard title={title} className={className}>
       <DataTable
         ariaLabel="Unit performance"
         columns={columns}

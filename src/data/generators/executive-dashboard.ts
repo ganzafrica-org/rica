@@ -409,7 +409,7 @@ export function buildExecutiveDashboard(args?: {
   });
 
   /* --- Section 4: Compliance --- */
-  // Break down by service for Farm Products, otherwise by unit.
+  // Break down by service for Farm Products, otherwise by unit code (readable axis).
   const complianceSource =
     unit === "fpu" && unitDefinitions[unit].services.length > 0
       ? unitDefinitions[unit].services.map((definition) => ({
@@ -417,7 +417,7 @@ export function buildExecutiveDashboard(args?: {
           seed: `${seedPrefix}:svc:${definition.id}`,
         }))
       : scoped.map((figure) => ({
-          name: unitDefinitions[figure.unit].shortLabel,
+          name: figure.unit.toUpperCase(),
           seed: `${seedPrefix}:unit:${figure.unit}`,
         }));
 

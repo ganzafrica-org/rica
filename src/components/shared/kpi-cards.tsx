@@ -46,6 +46,7 @@ export function KpiCards({ cards, className }: KpiCardsProps) {
       className={cn(
         "grid gap-4 sm:grid-cols-2 xl:grid-cols-4",
         cards.length === 3 && "xl:grid-cols-3",
+        cards.length === 5 && "xl:grid-cols-5",
         className,
       )}
     >
@@ -68,8 +69,14 @@ export function KpiCards({ cards, className }: KpiCardsProps) {
                 <p className="text-xl font-semibold tracking-tight text-foreground">
                   {card.value}
                 </p>
-                <p className="text-sm text-muted">{card.label}</p>
-                <p className="rica-caption">{card.hint}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {card.label}
+                </p>
+                {card.hint ? (
+                  <p className="mt-0.5 text-[11px] leading-snug text-muted/80">
+                    {card.hint}
+                  </p>
+                ) : null}
               </div>
             </div>
           </SurfaceCard>

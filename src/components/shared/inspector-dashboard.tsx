@@ -5,7 +5,6 @@ import { ActivityCharts } from "@/components/shared/activity-charts";
 import { AssignedFacilitiesTable } from "@/components/shared/assigned-facilities-table";
 import { ComplianceSummary } from "@/components/shared/compliance-summary";
 import { DonutChart } from "@/components/shared/donut-chart";
-import { FutureModulesCard } from "@/components/shared/future-modules-card";
 import { InspectionTrendChart } from "@/components/shared/inspection-trend-chart";
 import { KpiCards } from "@/components/shared/kpi-cards";
 import { ServiceFilter } from "@/components/shared/service-filter";
@@ -40,21 +39,9 @@ export function InspectorDashboard({
     [unitId, service],
   );
 
-  const activeService =
-    service === "all"
-      ? null
-      : unit.services.find((item) => item.id === service) ?? null;
-
   return (
     <PageTransition className="space-y-6">
-      <PageTitle
-        title={unit.label}
-        description={
-          activeService
-            ? `${activeService.label}${activeService.formCode ? ` · ${activeService.formCode}` : ""}`
-            : "Your assigned workload across all services in this unit"
-        }
-      />
+      <PageTitle title={unit.label} />
 
       <ServiceFilter
         services={unit.services}
@@ -63,31 +50,20 @@ export function InspectorDashboard({
       />
 
       <ContentSwap motionKey={service} className="space-y-6">
-        {/* Workload Summary */}
-        <section className="space-y-3">
-          <SectionHeading title="Workload Summary" />
-          <KpiCards cards={data.workload.kpis} />
-        </section>
+        <KpiCards cards={data.workload.kpis} />
 
-        {/* Inspection Progress */}
-        <section className="space-y-3">
-          <SectionHeading title="Inspection Progress" />
-          <div className="grid gap-6 lg:grid-cols-2">
-            <DonutChart
-              title="Completed vs Pending"
-              yLabel="Share of your assigned inspections"
-              slices={data.progress.donut}
-              centerLabel="Assigned"
-              showPeriodSelect={false}
-            />
-            <InspectionTrendChart trend={data.progress.trend} />
-          </div>
-        </section>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <DonutChart
+            title="Completed vs Pending"
+            slices={data.progress.donut}
+            centerLabel="Assigned"
+            showPeriodSelect={false}
+          />
+          <InspectionTrendChart trend={data.progress.trend} />
+        </div>
 
-        {/* Assigned Facilities — the card carries its own title. */}
         <AssignedFacilitiesTable facilities={data.facilities} />
 
-        {/* Compliance Summary */}
         <section className="space-y-3">
           <SectionHeading title="Compliance Summary" />
           <ComplianceSummary
@@ -96,7 +72,6 @@ export function InspectorDashboard({
           />
         </section>
 
-        {/* Inspection Activities */}
         {data.activities.length > 0 ? (
           <section className="space-y-3">
             <SectionHeading title="Inspection Activities" />
@@ -104,17 +79,11 @@ export function InspectorDashboard({
           </section>
         ) : null}
 
-        {/* Sampling Activities */}
         {data.sampling.length > 0 ? (
           <section className="space-y-3">
             <SectionHeading title="Sampling Activities" />
             <ActivityCharts charts={data.sampling} />
           </section>
-        ) : null}
-
-        {/* Future Modules */}
-        {data.futureModules.length > 0 ? (
-          <FutureModulesCard modules={data.futureModules} />
         ) : null}
       </ContentSwap>
     </PageTransition>

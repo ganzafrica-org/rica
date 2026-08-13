@@ -25,7 +25,7 @@ type AssignedFacilitiesTableProps = {
 export function AssignedFacilitiesTable({
   facilities,
   title = "Assigned Facilities",
-  description = "Facilities assigned to you and their current status",
+  description,
 }: AssignedFacilitiesTableProps) {
   return (
     <SurfaceCard title={title} description={description}>

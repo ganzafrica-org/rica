@@ -13,6 +13,14 @@ import {
 import { ChartCard } from "@/components/shared/chart-card";
 import type { ComplianceByServicePoint } from "@/types/dashboard";
 
+const unitCodeLabels: Record<string, string> = {
+  FPU: "Farm Products",
+  RLU: "Registration & Licensing",
+  IMU: "Market Surveillance",
+  IIU: "Import Inspection",
+  CCPU: "Competition & Consumer",
+};
+
 type GroupedBarChartProps = {
   title: string;
   data: readonly ComplianceByServicePoint[];
@@ -38,11 +46,11 @@ export function GroupedBarChart({
       caption={caption}
       showPeriodSelect={false}
     >
-      <div className="h-52 w-full">
+      <div className="h-56 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={[...data]}
-            margin={{ top: 8, right: 12, left: 4, bottom: 4 }}
+            margin={{ top: 8, right: 12, left: 4, bottom: 28 }}
           >
             <CartesianGrid
               stroke="var(--border)"
@@ -53,16 +61,23 @@ export function GroupedBarChart({
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "var(--muted)", fontSize: 11 }}
               interval={0}
+              angle={-28}
+              textAnchor="end"
+              height={56}
+              tick={{ fill: "var(--foreground)", fontSize: 11, fontWeight: 500 }}
             />
             <YAxis
+              width={36}
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "var(--muted)", fontSize: 12 }}
+              tick={{ fill: "var(--muted)", fontSize: 11 }}
             />
             <Tooltip
               cursor={{ fill: "var(--accent-soft)" }}
+              labelFormatter={(label) =>
+                unitCodeLabels[String(label)] ?? String(label)
+              }
               contentStyle={{
                 borderRadius: 8,
                 border: "1px solid var(--border)",
@@ -71,7 +86,7 @@ export function GroupedBarChart({
             />
             <Legend
               verticalAlign="bottom"
-              height={28}
+              height={24}
               iconType="circle"
               wrapperStyle={{ fontSize: 11, color: "var(--muted)" }}
             />
