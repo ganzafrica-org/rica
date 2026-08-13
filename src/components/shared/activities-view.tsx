@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { ActivityCharts } from "@/components/shared/activity-charts";
-import { FutureModulesCard } from "@/components/shared/future-modules-card";
 import { ServiceFilter } from "@/components/shared/service-filter";
 import { PageTitle } from "@/components/layout/page-title";
 import { ContentSwap, PageTransition } from "@/components/motion/page-transition";
@@ -20,7 +19,7 @@ export function ActivitiesView({
   unitId,
   initialService = "all",
 }: ActivitiesViewProps) {
-  const unit = getUnit(unitId);
+  const services = getUnit(unitId).services;
   const [service, setService] = useState<ServiceKey | "all">(initialService);
 
   const data = useMemo(
@@ -32,13 +31,10 @@ export function ActivitiesView({
 
   return (
     <PageTransition className="space-y-6">
-      <PageTitle
-        title="Inspection Activities"
-        description={`Activity and sampling breakdown for ${unit.shortLabel}`}
-      />
+      <PageTitle title="Inspection Activities" />
 
       <ServiceFilter
-        services={unit.services}
+        services={services}
         value={service}
         onChange={setService}
       />
@@ -63,15 +59,8 @@ export function ActivitiesView({
         ) : null}
 
         {!hasContent ? (
-          <SurfaceCard title="No activity data">
-            <p className="rica-body text-muted">
-              Activity breakdowns for this unit are pending requirements
-              gathering.
-            </p>
-          </SurfaceCard>
+          <SurfaceCard title="No activity data" />
         ) : null}
-
-        <FutureModulesCard modules={data.futureModules} />
       </ContentSwap>
     </PageTransition>
   );

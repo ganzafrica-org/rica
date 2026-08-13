@@ -25,10 +25,7 @@ export function ComplianceSummary({
 }: ComplianceSummaryProps) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
-      <SurfaceCard
-        title="Average Compliance Score"
-        description="Across inspected facilities"
-      >
+      <SurfaceCard title="Average Compliance Score">
         <div className="flex flex-col gap-3 py-2">
           <p className="text-4xl font-semibold tracking-tight text-foreground">
             {averageScore}
@@ -44,17 +41,11 @@ export function ComplianceSummary({
               style={{ width: `${averageScore}%` }}
             />
           </div>
-          <p className="rica-caption">
-            Based on completed inspections in the selected period
-          </p>
         </div>
       </SurfaceCard>
 
-      <ChartCard
-        title="Inspection Outcomes"
-        yLabel="Decisions recorded across completed inspections"
-        showPeriodSelect={false}
-      >
+      <ChartCard title="Inspection Outcomes" showPeriodSelect={false}>
+
         <div className="h-52 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart

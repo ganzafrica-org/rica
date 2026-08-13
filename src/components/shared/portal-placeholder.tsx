@@ -6,7 +6,7 @@ import { SurfaceCard } from "@/components/ui/surface-card";
 
 type PortalPlaceholderProps = {
   title: string;
-  description: string;
+  description?: string;
   hint?: string;
 };
 
@@ -19,12 +19,7 @@ export function PortalPlaceholder({
   return (
     <PageTransition className="space-y-6">
       <PageTitle title={title} description={description} />
-      <SurfaceCard title="Coming next" description={hint}>
-        <p className="rica-body text-muted">
-          This screen is routed and reachable, but its content is still to be
-          designed.
-        </p>
-      </SurfaceCard>
+      <SurfaceCard title="Coming next" description={hint} />
     </PageTransition>
   );
 }

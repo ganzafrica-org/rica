@@ -26,11 +26,16 @@ export function SurfaceCard({
   const hasHeader = Boolean(title || description || actions);
 
   return (
-    <Card className={cn("border-border/70 bg-surface shadow-sm", className)}>
+    <Card
+      className={cn(
+        "flex flex-col border-border/70 bg-surface shadow-sm",
+        className,
+      )}
+    >
       {hasHeader ? (
         <Card.Header
           className={cn(
-            "flex flex-row items-start justify-between gap-3 px-4 py-3",
+            "flex shrink-0 flex-row items-start justify-between gap-3 px-4 py-3",
             headerClassName,
           )}
         >
@@ -52,7 +57,9 @@ export function SurfaceCard({
         </Card.Header>
       ) : null}
       {children ? (
-        <Card.Content className={cn("px-4 pb-3 pt-0", contentClassName)}>
+        <Card.Content
+          className={cn("flex flex-1 flex-col px-4 pb-3 pt-0", contentClassName)}
+        >
           {children}
         </Card.Content>
       ) : null}

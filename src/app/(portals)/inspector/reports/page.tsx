@@ -6,11 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function InspectorReportsPage() {
-  return (
-    <PortalPlaceholder
-      title="Reports"
-      description="Exports and summaries for your assigned inspections"
-      hint="Report templates are pending confirmation with the unit."
-    />
-  );
+  return <PortalPlaceholder title="Reports" />;
 }

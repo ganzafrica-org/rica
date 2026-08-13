@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { PortalPlaceholder } from "@/components/shared/portal-placeholder";
+import { redirect } from "next/navigation";
+import { SeniorInspectorsView } from "@/components/shared/senior-inspectors-view";
+import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Inspectors",
 };
 
-export default function SeniorDirectorInspectorsPage() {
-  return (
-    <PortalPlaceholder
-      title="Inspectors"
-      description="Inspectors across all units under senior oversight"
-      hint="Needs an inspector roster before this can show real data."
-    />
-  );
+export default async function SeniorDirectorInspectorsPage() {
+  const user = await getSessionUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  return <SeniorInspectorsView />;
 }
