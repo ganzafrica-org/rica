@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { UnitDetailDashboard } from "@/components/shared/unit-detail-dashboard";
-import { getUnit, isUnitKey, unitList } from "@/data/units";
+import { getUnit, isUnitKey } from "@/data/units";
 import { getSessionUser } from "@/lib/session";
 
 type PageProps = {
@@ -9,9 +9,7 @@ type PageProps = {
   params: Promise<{ unit: string }>;
 };
 
-export function generateStaticParams() {
-  return unitList.map((unit) => ({ unit: unit.id }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -26,7 +24,8 @@ export async function generateMetadata({
 }
 
 export default async function UnitDetailPage({ params }: PageProps) {
-  const [{ unit }, user] = await Promise.all([params, getSessionUser()]);
+  const { unit } = await params;
+  const user = await getSessionUser();
 
   if (!user) {
     redirect("/login");

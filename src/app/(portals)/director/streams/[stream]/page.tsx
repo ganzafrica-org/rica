@@ -33,6 +33,8 @@ export async function generateMetadata({
   return { title: "Unit deep-dive" };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function DirectorDeepDivePage({ params }: PageProps) {
   const { stream } = await params;
   const user = await getSessionUser();
