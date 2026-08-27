@@ -90,9 +90,20 @@ export function DirectorStreamsView({
     "approval-by-cat",
     ...(unitKey === "imu" ? ["business", "assessment", "geo"] : []),
   ]);
-  const sections = filtered.sectionCharts.filter(
-    (section) => !dashboardOnlySectionIds.has(section.id),
-  );
+  const generalChartIds = new Set([
+    "general-commodities",
+    "general-decisions",
+    "general-trend",
+    "general-entry",
+    "general-missing",
+  ]);
+  const isGeneralCategory = productCategoryId === "general";
+  const sections = filtered.sectionCharts.filter((section) => {
+    if (dashboardOnlySectionIds.has(section.id)) return false;
+    if (isGeneralCategory) return generalChartIds.has(section.id);
+    if (productCategoryId) return !generalChartIds.has(section.id);
+    return !generalChartIds.has(section.id);
+  });
   // Stream/licensing category chosen in sidebar — geo/date only.
   // IIU product pages keep Country of Origin; category/name come from the sidebar.
   const filterMode =
@@ -121,9 +132,9 @@ export function DirectorStreamsView({
       items.push(
         <DirectorLineChart
           key={`${section.id}-line`}
-          title={`${section.title} — applications over time`}
+          title={section.title}
           data={section.line}
-          valueLabel="Received"
+          valueLabel={unitKey === "iiu" ? "Inspections" : "Received"}
           color={chartColors[sectionIndex % chartColors.length]}
         />,
       );
@@ -168,6 +179,7 @@ export function DirectorStreamsView({
   // RLU already has a Geographic distribution bar chart — skip the map duplicate.
   const showMap =
     unitKey !== "rlu" &&
+    !isGeneralCategory &&
     filtered.mapProvinces &&
     filtered.mapProvinces.length > 0 &&
     !streamId;
@@ -216,7 +228,8 @@ export function DirectorStreamsView({
         values={activeFilters}
         onChange={onFilterChange}
         hideProductCategory={Boolean(productCategoryId)}
-        hideProductName={Boolean(productNameId)}
+        hideProductName={Boolean(productNameId) || isGeneralCategory}
+        showGeneralCommodity={isGeneralCategory}
       />
 
       {combinedKpis && combinedKpis.length > 0 ? (

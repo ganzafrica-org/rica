@@ -164,15 +164,13 @@ function NavGroup({
     activeNestedHref,
   );
 
-  // Keep the accordion in sync with the route: open when a descendant is
-  // active, close when the user navigates elsewhere (e.g. Dashboard).
-  // Adjusting during render rather than in an effect avoids a second pass
-  // where the sidebar shows the previous route's open state.
+  // Keep this group's own accordion state in sync with the route.
+  // Only update local state here — calling a parent's onOpenChange during
+  // render is illegal (Cannot update NavGroup while rendering NavGroup).
   const [syncedPathname, setSyncedPathname] = useState(pathname);
   if (syncedPathname !== pathname) {
     setSyncedPathname(pathname);
-    if (onOpenChange) onOpenChange(childActive);
-    else setOpenUncontrolled(childActive);
+    if (openControlled === undefined) setOpenUncontrolled(childActive);
     setOpenNestedHref(activeNestedHref);
   }
 

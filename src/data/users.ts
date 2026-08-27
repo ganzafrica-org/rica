@@ -37,14 +37,6 @@ export const demoUsers: AuthUser[] = [
     title: "Inspector · Import Inspection",
     unit: "iiu",
   },
-  {
-    id: "inspector-ccpu",
-    email: "inspector.competition@rica.gov.rw",
-    name: "Aline Ingabire",
-    role: "inspector",
-    title: "Inspector · Competition & Consumer",
-    unit: "ccpu",
-  },
 
   // Directors — one per unit
   {
@@ -79,14 +71,6 @@ export const demoUsers: AuthUser[] = [
     role: "director",
     title: "Director · Import Inspection",
     unit: "iiu",
-  },
-  {
-    id: "director-ccpu-1",
-    email: "director.competition@rica.gov.rw",
-    name: "Patrick Nsengimana",
-    role: "director",
-    title: "Director · Competition & Consumer",
-    unit: "ccpu",
   },
 
   // Senior director — org-wide, so the unit is nominal.

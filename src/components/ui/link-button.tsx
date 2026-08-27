@@ -1,24 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { Button, type ButtonProps } from "@heroui/react";
+import { cn } from "@/lib/utils";
 
-type LinkButtonProps = Omit<ButtonProps, "render"> & {
+type LinkButtonProps = {
   href: string;
+  children: React.ReactNode;
+  className?: string;
 };
 
-export function LinkButton({ href, children, ...props }: LinkButtonProps) {
+export function LinkButton({ href, children, className }: LinkButtonProps) {
   return (
-    <Button
-      {...props}
-      render={(domProps) => {
-        const linkProps = domProps as unknown as React.ComponentProps<
-          typeof Link
-        >;
-        return <Link {...linkProps} href={href} />;
-      }}
+    <Link
+      href={href}
+      className={cn(
+        "inline-flex items-center justify-center bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-colors hover:opacity-90",
+        className,
+      )}
     >
       {children}
-    </Button>
+    </Link>
   );
 }

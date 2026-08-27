@@ -7,8 +7,8 @@ export type StreamKey =
 
 export type UserRole = "inspector" | "director" | "senior-director";
 
-/** The five RICA organisational units. */
-export type BusinessUnitKey = "fpu" | "rlu" | "imu" | "iiu" | "ccpu";
+/** The four RICA organisational units. */
+export type BusinessUnitKey = "fpu" | "rlu" | "imu" | "iiu";
 
 /** Alias used by the inspector and executive dashboards. */
 export type UnitKey = BusinessUnitKey;

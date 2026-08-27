@@ -18,7 +18,6 @@ const unitCodeLabels: Record<string, string> = {
   RLU: "Registration & Licensing",
   IMU: "Market Surveillance",
   IIU: "Import Inspection",
-  CCPU: "Competition & Consumer",
 };
 
 type GroupedBarChartProps = {

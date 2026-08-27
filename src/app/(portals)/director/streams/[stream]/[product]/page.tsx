@@ -13,6 +13,8 @@ type PageProps = {
   params: Promise<{ stream: string; product: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
