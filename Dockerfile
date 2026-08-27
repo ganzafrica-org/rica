@@ -16,6 +16,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
+# bind to all interfaces so localhost healthchecks reach the server
+# (Next standalone otherwise binds to $HOSTNAME = the container id)
+ENV HOSTNAME=0.0.0.0
 # Next standalone output: server + minimal node_modules + static assets
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
