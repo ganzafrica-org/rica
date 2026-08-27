@@ -187,13 +187,14 @@ export const directorNavByUnit: Record<BusinessUnitKey, NavItem[]> = {
             },
           ],
         },
+        {
+          href: "/director/streams/general",
+          label: "General Category",
+          shortLabel: "General",
+          icon: "layers",
+        },
       ],
     },
-  ],
-  ccpu: [
-    { href: "/director", label: "Dashboard", icon: "dashboard" },
-    { href: "/director/team", label: "Team", icon: "users" },
-    { href: "/director/streams", label: "Cases", icon: "layers" },
   ],
 };
 
@@ -249,6 +250,7 @@ export const directorProductCategoryIds = [
   "cosmetics",
   "chemicals",
   "electronics",
+  "general",
 ] as const;
 
 export type DirectorProductCategoryId =
@@ -262,6 +264,7 @@ export const directorProductCategoryLabels: Record<
   cosmetics: "Cosmetics",
   chemicals: "Chemicals",
   electronics: "Electronics",
+  general: "General Category",
 };
 
 export function isDirectorProductCategoryId(
@@ -296,6 +299,8 @@ export const directorProductsByCategory: Record<
     { id: "laptop", label: "Laptop" },
     { id: "charger", label: "Charger" },
   ],
+  /** No product-level checklists — commodities are filtered on the page. */
+  general: [],
 };
 
 export function isDirectorProductId(
@@ -371,12 +376,6 @@ export const seniorDirectorNav: NavItem[] = [
         shortLabel: "IIU",
         icon: "building",
       },
-      {
-        href: "/senior-director/units/ccpu",
-        label: "Competition & Consumer",
-        shortLabel: "CCPU",
-        icon: "users",
-      },
     ],
   },
   { href: "/senior-director/inspectors", label: "Inspectors", icon: "users" },
@@ -425,10 +424,5 @@ export const streamPageCopy: Record<
     title: "Product categories",
     description:
       "Document review, physical inspection, sampling, and import distribution (§4.2).",
-  },
-  ccpu: {
-    title: "Cases & activities",
-    description:
-      "Unit-specific KPIs pending checklist and dataset (§5.2).",
   },
 };

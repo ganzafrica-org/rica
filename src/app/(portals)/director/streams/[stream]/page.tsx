@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { DirectorStreamsView } from "@/components/director";
 import {
   directorCategoryLabels,
+  directorProductCategoryLabels,
   directorProductsByCategory,
   directorStreamLabels,
   isDirectorCategoryId,
@@ -23,6 +24,9 @@ export async function generateMetadata({
 
   if (user?.unit === "rlu" && isDirectorCategoryId(stream)) {
     return { title: directorCategoryLabels[stream] };
+  }
+  if (user?.unit === "iiu" && isDirectorProductCategoryId(stream)) {
+    return { title: directorProductCategoryLabels[stream] };
   }
   if (isDirectorStreamId(stream)) {
     return { title: directorStreamLabels[stream] };
@@ -45,12 +49,14 @@ export default async function DirectorDeepDivePage({ params }: PageProps) {
     return <DirectorStreamsView categoryId={stream} />;
   }
 
-  // IIU: category URLs only expand in the sidebar — open the first product.
+  // IIU: checklist categories open the first product; General Category is a page.
   if (user?.unit === "iiu") {
     if (!isDirectorProductCategoryId(stream)) notFound();
-    const firstProduct = directorProductsByCategory[stream][0];
-    if (!firstProduct) notFound();
-    redirect(`/director/streams/${stream}/${firstProduct.id}`);
+    const products = directorProductsByCategory[stream];
+    if (products.length === 0) {
+      return <DirectorStreamsView productCategoryId={stream} />;
+    }
+    redirect(`/director/streams/${stream}/${products[0].id}`);
   }
 
   // FPU regulatory streams (sidebar dropdown)

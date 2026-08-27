@@ -20,6 +20,9 @@ export type DirectorFilterValues = {
   outletType: string;
   productCategory: string;
   productName: string;
+  generalCommodity: string;
+  officeName: string;
+  inspectionName: string;
   country: string;
 };
 
@@ -32,6 +35,9 @@ export const defaultDirectorFilterValues: DirectorFilterValues = {
   outletType: "all",
   productCategory: "all",
   productName: "all",
+  generalCommodity: "all",
+  officeName: "all",
+  inspectionName: "all",
   country: "all",
 };
 
@@ -44,6 +50,8 @@ type DirectorFiltersProps = {
   hideProductCategory?: boolean;
   /** When product name is chosen in the sidebar (IIU). */
   hideProductName?: boolean;
+  /** General Category page — commodities without a product checklist. */
+  showGeneralCommodity?: boolean;
 };
 
 function FilterSelect({
@@ -115,12 +123,19 @@ export function DirectorFilters({
   onChange,
   hideProductCategory = false,
   hideProductName = false,
+  showGeneralCommodity = false,
 }: DirectorFiltersProps) {
   const current = { ...defaultDirectorFilterValues, ...values };
+  const isIiu = filterMode === "iiu";
+  const showIiuCategoryFilters =
+    isIiu &&
+    (!hideProductCategory ||
+      showGeneralCommodity ||
+      (!hideProductName && !showGeneralCommodity));
   const hasUnitFilters =
     filterMode === "categories" ||
     filterMode === "imu" ||
-    filterMode === "iiu";
+    showIiuCategoryFilters;
 
   const provinces = useMemo(() => provinceFilterOptions(), []);
   const districts = useMemo(
@@ -141,21 +156,40 @@ export function DirectorFilters({
       )}
     >
       <FilterBar>
-        <FilterSelect
-          label="Province"
-          options={provinces}
-          selectedKey={current.province}
-          onSelectionChange={(value) => {
-            onChange?.("province", value);
-            onChange?.("district", "all");
-          }}
-        />
-        <FilterSelect
-          label="District"
-          options={districts}
-          selectedKey={current.district}
-          onSelectionChange={(value) => onChange?.("district", value)}
-        />
+        {isIiu ? (
+          <>
+            <FilterSelect
+              label="Office name"
+              options={directorFilterOptions.officeNames}
+              selectedKey={current.officeName}
+              onSelectionChange={(value) => onChange?.("officeName", value)}
+            />
+            <FilterSelect
+              label="Inspection name"
+              options={directorFilterOptions.inspectionNames}
+              selectedKey={current.inspectionName}
+              onSelectionChange={(value) => onChange?.("inspectionName", value)}
+            />
+          </>
+        ) : (
+          <>
+            <FilterSelect
+              label="Province"
+              options={provinces}
+              selectedKey={current.province}
+              onSelectionChange={(value) => {
+                onChange?.("province", value);
+                onChange?.("district", "all");
+              }}
+            />
+            <FilterSelect
+              label="District"
+              options={districts}
+              selectedKey={current.district}
+              onSelectionChange={(value) => onChange?.("district", value)}
+            />
+          </>
+        )}
         <FilterDateRange label="Date range" />
       </FilterBar>
 
@@ -200,14 +234,24 @@ export function DirectorFilters({
               {!hideProductCategory ? (
                 <FilterSelect
                   label="Product category"
-                  options={directorFilterOptions.productCategories}
+                  options={directorFilterOptions.iiuProductCategories}
                   selectedKey={current.productCategory}
                   onSelectionChange={(value) =>
                     onChange?.("productCategory", value)
                   }
                 />
               ) : null}
-              {!hideProductName ? (
+              {showGeneralCommodity ? (
+                <FilterSelect
+                  label="General category"
+                  options={directorFilterOptions.generalCommodities}
+                  selectedKey={current.generalCommodity}
+                  onSelectionChange={(value) =>
+                    onChange?.("generalCommodity", value)
+                  }
+                />
+              ) : null}
+              {!hideProductName && !showGeneralCommodity ? (
                 <FilterSelect
                   label="Product name"
                   options={directorFilterOptions.productNames}
@@ -217,12 +261,6 @@ export function DirectorFilters({
                   }
                 />
               ) : null}
-              <FilterSelect
-                label="Country of origin"
-                options={directorFilterOptions.countries}
-                selectedKey={current.country}
-                onSelectionChange={(value) => onChange?.("country", value)}
-              />
             </>
           ) : null}
         </FilterBar>
