@@ -32,15 +32,11 @@ export function DirectorTeamView() {
     <PageTransition className="space-y-6">
       <PageTitle title="Team performance & workload" />
       <DirectorFilters
-        filterMode={
-          data.filterMode === "categories" ||
-          data.filterMode === "imu" ||
-          data.filterMode === "iiu"
-            ? "basic"
-            : data.filterMode
-        }
+        filterMode={data.filterMode === "categories" || data.filterMode === "imu" ? "basic" : data.filterMode}
         values={filters}
         onChange={onFilterChange}
+        hideProductCategory
+        hideProductName
       />
 
       <DirectorTeamTable rows={data.team} officerLabel={officerLabel} />

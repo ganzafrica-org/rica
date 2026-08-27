@@ -7,7 +7,7 @@ import { PageTitle } from "@/components/layout/page-title";
 import { PageTransition } from "@/components/motion/page-transition";
 import { buildExecutiveDashboard } from "@/data/generators/executive-dashboard";
 
-/** Landing page for the five unit drill-downs. */
+/** Landing page for the unit drill-downs. */
 export function UnitsIndex() {
   const data = useMemo(() => buildExecutiveDashboard(), []);
 

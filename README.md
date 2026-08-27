@@ -9,10 +9,10 @@ Authority), covering all three actors from the KPI framework: **Inspectors**,
 - Glassmorphism **login page** with email/password and one-tap demo account cards
 - **Cookie-based demo auth** (`/api/auth/login`, `/logout`, `/me`)
 - **Role routing** via `src/proxy.ts` — each user only reaches their own portal
-- **Unit scoping** — inspectors and directors are assigned to one of RICA's five
+- **Unit scoping** — inspectors and directors are assigned to one of RICA's four
   business units and only see that unit's data
 
-### Inspector portal — all 5 units
+### Inspector portal — all 4 units
 
 - `/inspector` renders the signed-in inspector's unit
 - 7-section dashboard per the KPI spec: Workload Summary, Inspection Progress,
@@ -30,7 +30,7 @@ Authority), covering all three actors from the KPI framework: **Inspectors**,
 
 ### Senior Director — executive dashboard
 
-- Org-wide across all five units: Executive Highlights, Organizational
+- Org-wide across all four units: Executive Highlights, Organizational
   Performance, Regulatory Coverage, Compliance, Unit Performance, and
   Director Dashboards
 - **Leaflet + OpenStreetMap** map of registered entities across all 30 Rwandan
@@ -39,10 +39,9 @@ Authority), covering all three actors from the KPI framework: **Inspectors**,
 
 > **KPI provenance:** Farm Products follows the source spec exactly. Registration
 > & Licensing is derived from that unit's Director-level sections. Market
-> Surveillance, Import Inspection and Consumer Protection are **plausible
-> placeholders** — the source doc has no forms or datasets for them yet, so the
-> content specs in `src/data/units/` should be replaced once RICA shares the real
-> inspection forms.
+> Surveillance and Import Inspection are **plausible placeholders** — the source
+> doc has no forms or datasets for them yet, so the content specs in
+> `src/data/units/` should be replaced once RICA shares the real inspection forms.
 
 ## Technologies
 
@@ -133,12 +132,10 @@ Password for all: `password`
 | Inspector | Registration & Licensing (RLU) | `inspector.licensing@rica.gov.rw` |
 | Inspector | Market Surveillance (IMU) | `inspector.market@rica.gov.rw` |
 | Inspector | Import Inspection (IIU) | `inspector.imports@rica.gov.rw` |
-| Inspector | Competition & Consumer (CCPU) | `inspector.competition@rica.gov.rw` |
 | Director | Farm Products (FPU) | `director.farm@rica.gov.rw` |
 | Director | Registration & Licensing (RLU) | `director.licensing@rica.gov.rw` |
 | Director | Market Surveillance (IMU) | `director.market@rica.gov.rw` |
 | Director | Import Inspection (IIU) | `director.imports@rica.gov.rw` |
-| Director | Competition & Consumer (CCPU) | `director.competition@rica.gov.rw` |
 | Senior Director | org-wide | `senior.director@rica.gov.rw` |
 
 `inspector@rica.gov.rw` and `director@rica.gov.rw` still work as aliases for the

@@ -25,13 +25,12 @@ import type { AccentKey, ProvinceKey, ServiceKey, UnitKey } from "@/types";
 
 const DEFAULT_PERIOD = "2026-Q3";
 
-/** One accent per unit — AccentKey happens to have exactly five values. */
+/** One accent per unit. */
 const unitAccents: Record<UnitKey, AccentKey> = {
   fpu: "seed",
   rlu: "slaughterhouse",
   imu: "agrochemical",
   iiu: "seed-producer",
-  ccpu: "accent",
 };
 
 /** Regulated categories the coverage map can be filtered by. */
@@ -258,7 +257,7 @@ export function buildExecutiveDashboard(args?: {
       id: "applications",
       label: "Applications Received",
       value: formatNumber(scale(totals.applications)),
-      hint: unit === "all" ? "Across all five units" : unitDefinitions[unit].shortLabel,
+      hint: unit === "all" ? "Across all units" : unitDefinitions[unit].shortLabel,
       tone: "accent",
     },
     {

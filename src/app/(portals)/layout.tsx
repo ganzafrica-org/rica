@@ -4,6 +4,8 @@ import { getNavForUser } from "@/data/navigation";
 import { getPortalLabel } from "@/lib/auth";
 import { getSessionUser } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 export default async function PortalsLayout({
   children,
 }: Readonly<{

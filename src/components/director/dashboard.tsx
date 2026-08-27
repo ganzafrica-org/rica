@@ -34,7 +34,6 @@ const iiuDashboardChartIds = new Set([
   "doc-review",
   "samples",
   "missing-docs",
-  "origin",
 ]);
 
 export function DirectorDashboard() {
@@ -57,9 +56,7 @@ export function DirectorDashboard() {
       ? "Monthly applications completed"
       : unitKey === "iiu"
         ? "Monthly trend of consignments reviewed"
-        : unitKey === "ccpu"
-          ? "Monthly unit KPI trend"
-          : "Average compliance score over time";
+        : "Average compliance score over time";
   const trendLabel =
     unitKey === "rlu" || unitKey === "iiu" ? "Completed" : "Score";
 
@@ -156,7 +153,7 @@ export function DirectorDashboard() {
             colorOffset={0}
           />
           <DirectorStackedBarChart
-            title="Outcomes by province"
+            title="Outcomes by office"
             data={filtered.outcomesByProvince}
             series={stackedOutcomeSeries}
           />

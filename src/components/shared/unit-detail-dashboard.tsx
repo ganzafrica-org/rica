@@ -46,9 +46,7 @@ const unitSummaryChartIds: Record<UnitKey, readonly string[]> = {
     "physical-decisions",
     "samples",
     "missing-docs",
-    "origin",
   ],
-  ccpu: [],
 };
 
 function toKpiCard(item: KpiItem): KpiCard {
@@ -89,7 +87,7 @@ function collectUnitKpis(unitId: UnitKey): KpiCard[] {
     }
   }
 
-  // CCPU / empty units — fall back to executive org KPIs for that unit.
+  // Empty units — fall back to executive org KPIs for that unit.
   if (cards.length === 0) {
     const executive = buildExecutiveDashboard({ unit: unitId });
     return executive.organizational.kpis.slice(0, 5);
@@ -121,9 +119,7 @@ export function UnitDetailDashboard({ unitId }: UnitDetailDashboardProps) {
       ? "Monthly applications completed"
       : unitId === "iiu"
         ? "Monthly consignments reviewed"
-        : unitId === "ccpu"
-          ? "Monthly unit KPI trend"
-          : "Average compliance score over time";
+        : "Average compliance score over time";
   const trendLabel =
     unitId === "rlu" || unitId === "iiu" ? "Completed" : "Score";
 
@@ -203,7 +199,7 @@ export function UnitDetailDashboard({ unitId }: UnitDetailDashboardProps) {
               />
             )}
             <DirectorStackedBarChart
-              title="Outcomes by province"
+              title={unitId === "iiu" ? "Outcomes by office" : "Outcomes by province"}
               data={director.outcomesByProvince}
               series={stackedOutcomeSeries}
             />

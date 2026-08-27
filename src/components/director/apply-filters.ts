@@ -39,14 +39,23 @@ const productCategoryAliases: Record<string, string[]> = {
   cosmetics: ["cosmetics"],
   chemicals: ["chemicals"],
   electronics: ["electronics"],
+  general: ["general", "other"],
 };
 
-const countryAliases: Record<string, string[]> = {
-  china: ["china"],
-  india: ["india"],
-  uae: ["uae"],
-  kenya: ["kenya"],
-  eu: ["eu"],
+const generalCommodityAliases: Record<string, string[]> = {
+  "used-clothing": ["used clothing"],
+  construction: ["construction"],
+  pharmaceuticals: ["pharmaceuticals"],
+  automotive: ["automotive"],
+  textiles: ["textiles"],
+  plastics: ["plastics"],
+  machinery: ["machinery"],
+  other: ["other"],
+};
+
+const officeAliases: Record<string, string[]> = {
+  gatuna: ["gatuna"],
+  "airport-cargo": ["airport cargo", "airport"],
 };
 
 const provinceAliases: Record<string, string[]> = {
@@ -117,6 +126,11 @@ function scaleTrend(
         ? undefined
         : Math.max(1, Math.round(point.previous * factor)),
   }));
+}
+
+function inspectionScale(inspection: string) {
+  if (inspection === "all") return 1;
+  return 0.28;
 }
 
 function categoryScale(category: string) {
@@ -194,7 +208,9 @@ export function applyDirectorFilters(
   const scale =
     data.filterMode === "categories"
       ? categoryScale(filters.category)
-      : 1;
+      : data.filterMode === "iiu"
+        ? inspectionScale(filters.inspectionName)
+        : 1;
 
   let outcomes = data.outcomes;
   if (data.filterMode === "categories" && filters.category !== "all") {
@@ -203,11 +219,14 @@ export function applyDirectorFilters(
 
   let outcomesByProvince = filterStacked(
     data.outcomesByProvince,
-    filters.province,
-    provinceAliases,
+    data.filterMode === "iiu" ? filters.officeName : filters.province,
+    data.filterMode === "iiu" ? officeAliases : provinceAliases,
   )!;
 
-  if (data.filterMode === "categories" && filters.category !== "all") {
+  if (
+    (data.filterMode === "categories" && filters.category !== "all") ||
+    (data.filterMode === "iiu" && filters.inspectionName !== "all")
+  ) {
     outcomesByProvince = scaleStackedProvince(outcomesByProvince, scale);
   }
 
@@ -300,13 +319,36 @@ export function applyDirectorFilters(
             productCategoryAliases,
           );
         }
-        if (section.id === "origin") {
-          bars = filterNamed(bars, filters.country, countryAliases);
+        if (section.id.startsWith("general-")) {
+          bars = filterNamed(
+            bars,
+            filters.generalCommodity,
+            generalCommodityAliases,
+          );
+          stacked = filterStacked(
+            stacked,
+            filters.generalCommodity,
+            generalCommodityAliases,
+          );
+          if (filters.generalCommodity !== "all" && line) {
+            line = scaleTrend(line, 0.18);
+          }
+          if (filters.generalCommodity !== "all" && donut) {
+            donut = donut.map((slice) => ({
+              ...slice,
+              value: Math.max(1, Math.round(slice.value * 0.18)),
+            }));
+          }
         }
       }
 
-      bars = filterNamed(bars, filters.province, provinceAliases);
-      stacked = filterStacked(stacked, filters.province, provinceAliases);
+      if (data.filterMode !== "iiu") {
+        bars = filterNamed(bars, filters.province, provinceAliases);
+        stacked = filterStacked(stacked, filters.province, provinceAliases);
+      } else {
+        bars = filterNamed(bars, filters.officeName, officeAliases);
+        stacked = filterStacked(stacked, filters.officeName, officeAliases);
+      }
 
       return { ...section, bars, stacked, kpis, line, donut };
     });

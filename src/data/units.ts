@@ -1,4 +1,3 @@
-import { competitionConsumerProtectionContent } from "@/data/units/competition-consumer-protection";
 import { farmProductsContent } from "@/data/units/farm-products";
 import { importInspectionContent } from "@/data/units/import-inspection";
 import { industriesMarketSurveillanceContent } from "@/data/units/industries-market-surveillance";
@@ -43,12 +42,6 @@ export const businessUnits: Record<BusinessUnitKey, BusinessUnit> = {
     name: "Import Inspection Unit",
     shortName: "Import Inspection",
     code: "IIU",
-  },
-  ccpu: {
-    key: "ccpu",
-    name: "Competition & Consumer Protection Unit",
-    shortName: "Competition & Consumer",
-    code: "CCPU",
   },
 };
 
@@ -147,14 +140,6 @@ export const unitDefinitions: Record<UnitKey, UnitDefinition> = {
     services: [],
     sections: allSections,
   },
-  ccpu: {
-    id: "ccpu",
-    label: businessUnits.ccpu.name,
-    shortLabel: businessUnits.ccpu.shortName,
-    icon: "users",
-    services: [],
-    sections: allSections,
-  },
 };
 
 export const unitList: UnitDefinition[] = Object.values(unitDefinitions);
@@ -165,7 +150,6 @@ export const unitContent: Partial<Record<UnitKey, UnitContentSpec>> = {
   rlu: registrationLicensingContent,
   imu: industriesMarketSurveillanceContent,
   iiu: importInspectionContent,
-  ccpu: competitionConsumerProtectionContent,
 };
 
 export function getUnit(id: UnitKey): UnitDefinition {
