@@ -17,7 +17,7 @@ export default async function InspectorDashboardPage() {
   return (
     <InspectorDashboard
       unitId={user.unit}
-      initialService={user.homeService ?? "all"}
+      initialService={user.unit === "fpu" ? "all" : user.homeService ?? "all"}
     />
   );
 }

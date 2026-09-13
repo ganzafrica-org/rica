@@ -55,29 +55,43 @@ export function KpiCards({ cards, className }: KpiCardsProps) {
         const Icon = tone.icon;
 
         return (
-          <SurfaceCard key={card.id} contentClassName="px-4 py-3">
-            <div className="flex items-center gap-3">
-              <div
-                className={cn(
-                  "flex size-9 shrink-0 items-center justify-center",
-                  tone.wrap,
-                )}
-              >
-                <Icon className="size-4" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xl font-semibold tracking-tight text-foreground">
-                  {card.value}
-                </p>
-                <p className="text-sm font-medium text-foreground">
-                  {card.label}
-                </p>
-                {card.hint ? (
-                  <p className="mt-0.5 text-[11px] leading-snug text-muted/80">
-                    {card.hint}
+          <SurfaceCard key={card.id} className="h-full" contentClassName="px-4 py-3">
+            <div className="flex h-full flex-col gap-2">
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "flex size-9 shrink-0 items-center justify-center",
+                    tone.wrap,
+                  )}
+                >
+                  <Icon className="size-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xl font-semibold tracking-tight text-foreground">
+                    {card.value}
                   </p>
-                ) : null}
+                  <p className="text-sm font-medium text-foreground">
+                    {card.label}
+                  </p>
+                  {card.hint ? (
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted/80">
+                      {card.hint}
+                    </p>
+                  ) : null}
+                </div>
               </div>
+              {card.progress != null ? (
+                <div
+                  className="mt-auto h-1.5 w-full overflow-hidden rounded-full bg-default"
+                  role="img"
+                  aria-label={`${card.label} ${card.progress} percent`}
+                >
+                  <div
+                    className="h-full rounded-full bg-accent"
+                    style={{ width: `${card.progress}%` }}
+                  />
+                </div>
+              ) : null}
             </div>
           </SurfaceCard>
         );

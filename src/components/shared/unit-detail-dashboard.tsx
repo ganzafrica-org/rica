@@ -22,17 +22,15 @@ import { getUnit } from "@/data/units";
 import type { UnitKey } from "@/types";
 import type { KpiCard } from "@/types/dashboard";
 
-function SectionHeading({ title }: { title: string }) {
-  return (
-    <h3 className="text-sm font-semibold tracking-tight text-foreground">
-      {title}
-    </h3>
-  );
-}
-
 /** Director chart ids to surface on each senior-director unit page. */
 const unitSummaryChartIds: Record<UnitKey, readonly string[]> = {
-  fpu: ["seed", "slaughterhouse", "agrochemical", "seed-producer"],
+  fpu: [
+    "livestock-decisions",
+    "livestock-value-chain",
+    "plant-warehouse",
+    "seed",
+    "agrochemical",
+  ],
   rlu: ["operators", "approval-by-cat", "geo-operators", "renewals"],
   imu: [
     "business",
@@ -79,10 +77,12 @@ function collectUnitKpis(unitId: UnitKey): KpiCard[] {
     }
   }
 
-  // FPU overview KPIs sit on stream sections — take Seed’s headline set.
+  // FPU overview KPIs sit on stream sections — take Livestock’s headline set.
   if (cards.length === 0 && unitId === "fpu") {
-    const seed = director.sectionCharts.find((section) => section.id === "seed");
-    for (const item of seed?.kpis ?? []) {
+    const livestock = director.sectionCharts.find(
+      (section) => section.id === "livestock",
+    );
+    for (const item of livestock?.kpis ?? []) {
       cards.push(toKpiCard(item));
     }
   }
@@ -101,13 +101,12 @@ type UnitDetailDashboardProps = {
 };
 
 /**
- * Per-unit senior view — sidebar Units dropdown selects the unit.
+ * Per-unit senior view — one summary page per unit, no stream drill-down.
  * Content is pulled from Director dashboards so each unit has its own data.
  */
 export function UnitDetailDashboard({ unitId }: UnitDetailDashboardProps) {
   const unit = getUnit(unitId);
   const director = directorDashboards[unitId];
-
   const kpis = useMemo(() => collectUnitKpis(unitId), [unitId]);
 
   const trendData =
@@ -212,32 +211,26 @@ export function UnitDetailDashboard({ unitId }: UnitDetailDashboardProps) {
           </SurfaceCard>
         )}
 
-        <section className="space-y-3">
-          <SectionHeading title="Performance trends" />
-          <div className="grid gap-6 lg:grid-cols-2">
-            <DirectorLineChart
-              title={trendTitle}
-              data={trendData}
-              valueLabel={trendLabel}
-              color={chartColors[0]}
-            />
-            <DirectorLineChart
-              title="Year-on-year comparison"
-              data={director.yoyTrend}
-              showPrevious
-              valueLabel="This year"
-              previousLabel="Last year"
-              color={chartColors[2]}
-              previousColor={chartColors[3]}
-            />
-          </div>
-        </section>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <DirectorLineChart
+            title={trendTitle}
+            data={trendData}
+            valueLabel={trendLabel}
+            color={chartColors[0]}
+          />
+          <DirectorLineChart
+            title="Year-on-year comparison"
+            data={director.yoyTrend}
+            showPrevious
+            valueLabel="This year"
+            previousLabel="Last year"
+            color={chartColors[2]}
+            previousColor={chartColors[3]}
+          />
+        </div>
 
         {unitCharts.length > 0 ? (
-          <section className="space-y-3">
-            <SectionHeading title="Unit activity" />
-            <div className="grid gap-6 lg:grid-cols-2">{unitCharts}</div>
-          </section>
+          <div className="grid gap-6 lg:grid-cols-2">{unitCharts}</div>
         ) : null}
       </ContentSwap>
     </PageTransition>

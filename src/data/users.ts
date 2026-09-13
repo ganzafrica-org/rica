@@ -11,7 +11,7 @@ export const demoUsers: AuthUser[] = [
     role: "inspector",
     title: "Inspector · Farm Products",
     unit: "fpu",
-    homeService: "seed",
+    homeService: "livestock",
   },
   {
     id: "inspector-rlu",

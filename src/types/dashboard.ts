@@ -7,6 +7,8 @@ export type KpiCard = {
   value: string;
   hint: string;
   tone: AccentKey;
+  /** 0–100 bar under the card, used for compliance score. */
+  progress?: number;
 };
 
 export type DonutSlice = {
@@ -29,6 +31,24 @@ export type AssignedFacility = {
   classification: string;
   district: string;
   registrationStatus: StatusKey;
+};
+
+export type PendingInspectionRow = {
+  id: string;
+  name: string;
+  type: string;
+  extra?: string;
+  district: string;
+  status: StatusKey;
+};
+
+export type InspectorPendingSection = {
+  id: ServiceKey;
+  title: string;
+  nameHeader: string;
+  typeHeader: string;
+  extraHeader?: string;
+  rows: PendingInspectionRow[];
 };
 
 export type ComplianceOutcome = {
@@ -64,7 +84,14 @@ export type InspectorDashboardData = {
     trend: Record<TrendGranularity, TrendPoint[]>;
   };
   facilities: AssignedFacility[];
-  compliance: { averageScore: number; outcomes: ComplianceOutcome[] };
+  pendingSections: InspectorPendingSection[];
+  compliance: {
+    averageScore: number;
+    outcomes: ComplianceOutcome[];
+    lowestScore: number;
+    highestScore: number;
+    scoredCount: number;
+  };
   activities: ActivityChart[];
   sampling: ActivityChart[];
   futureModules: FutureModule[];

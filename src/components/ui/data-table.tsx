@@ -24,6 +24,8 @@ type DataTableProps<T> = {
   emptyMessage?: string;
   /** Show a leading # column. Defaults to true. */
   showRowNumbers?: boolean;
+  /** First row number when paginating. Defaults to 1. */
+  rowNumberStart?: number;
   /** Show trailing actions menu. Defaults to true. */
   showActions?: boolean;
   onRowAction?: (action: TableRowAction, row: T) => void;
@@ -38,6 +40,7 @@ export function DataTable<T extends object>({
   className,
   emptyMessage = "No records found.",
   showRowNumbers = true,
+  rowNumberStart = 1,
   showActions = true,
   onRowAction,
 }: DataTableProps<T>) {
@@ -79,7 +82,7 @@ export function DataTable<T extends object>({
                 <Table.Row key={getRowKey(row)}>
                   {showRowNumbers ? (
                     <Table.Cell className="tabular-nums text-muted">
-                      {index + 1}
+                      {rowNumberStart + index}
                     </Table.Cell>
                   ) : null}
                   {columns.map((column) => {

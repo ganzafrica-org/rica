@@ -42,7 +42,7 @@ export function ProvinceMapCard({
   const activeValue = active ? (valueByKey.get(active) ?? 0) : null;
 
   return (
-    <ChartCard title={title}>
+    <ChartCard title={title} caption={description}>
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="relative mx-auto w-full max-w-[340px]">
           <svg

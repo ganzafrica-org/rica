@@ -1,16 +1,142 @@
 import type { UnitContentSpec } from "@/data/units/content-spec";
 
 /**
- * Farm Products & Processes Inspection Unit.
+ * Farm Products & Processes Inspection Unit — four MIS subunits.
  *
- * Activities and sampling follow the source spec: Seed inspectors report fields
- * by crop and crop quality; agrochemical inspectors report premises by dealer
- * category and licensing outcomes; slaughterhouse by classification; butchery
- * and meat carrier by inspection outcome.
+ * Livestock covers the former slaughterhouse / butchery / meat-carrier
+ * checklists plus feed, honey, and dairy premises. Seed covers producer
+ * verification, field inspection, potato seed store, and sampling.
  */
 export const farmProductsContent: UnitContentSpec = {
   unit: "fpu",
   services: {
+    livestock: {
+      facilityPrefixes: [
+        "Nyabugogo",
+        "Gikondo",
+        "Musanze",
+        "Rwamagana",
+        "Huye",
+        "Kimironko",
+        "Nyagatare",
+      ],
+      facilitySuffixes: [
+        "Abattoir",
+        "Butchery",
+        "Meat Transport",
+        "Feed Depot",
+        "Honey Centre",
+        "Milk Collection",
+      ],
+      classifications: [
+        "Slaughterhouse",
+        "Butchery",
+        "Meat Carrier",
+        "Feed Retailer",
+        "Feed Processing Unit",
+        "Beekeeper Cooperative",
+        "Honey Collection Center",
+        "Honey Processing Unit",
+        "Milk Collection Center",
+        "Milk Kiosk",
+        "MAP",
+      ],
+      workloadScale: 48,
+      activities: [
+        {
+          id: "livestock-by-type",
+          title: "Inspections by Facility Type",
+          caption: "Livestock and premises visits in the selected period",
+          kind: "bar",
+          categories: [
+            "Slaughterhouse",
+            "Butchery",
+            "Meat Carrier",
+            "Feed",
+            "Honey",
+            "Dairy",
+          ],
+          scale: 22,
+        },
+        {
+          id: "livestock-outcomes",
+          title: "Inspection Outcomes",
+          kind: "donut",
+          categories: [
+            "Quick registration",
+            "Continue & correct",
+            "Temporary closure",
+            "Closure & relocation",
+          ],
+          scale: 28,
+        },
+      ],
+      sampling: [],
+    },
+
+    "plant-warehouse": {
+      facilityPrefixes: [
+        "Kigali",
+        "Musanze",
+        "Rubavu",
+        "Rusumo",
+        "Huye",
+        "Nyagatare",
+      ],
+      facilitySuffixes: [
+        "Exporters Ltd",
+        "Produce Warehouse",
+        "Cold Store",
+        "Packhouse",
+        "Export Co.",
+      ],
+      classifications: [
+        "Coffee",
+        "Tea",
+        "Fresh fruit",
+        "Vegetables",
+        "Cut flowers",
+        "Chili",
+      ],
+      workloadScale: 32,
+      activities: [
+        {
+          id: "consignments-by-decision",
+          title: "Consignment Decisions",
+          caption: "Phytosanitary export and warehouse inspections",
+          kind: "donut",
+          categories: [
+            "Confirmed / Accepted All",
+            "Laboratory Diagnosis",
+            "Only [X] kgs Accepted",
+            "Rejected All",
+          ],
+          scale: 24,
+        },
+        {
+          id: "consignments-by-destination",
+          title: "Consignments by Destination",
+          kind: "bar",
+          categories: ["UAE", "Netherlands", "UK", "Belgium", "Kenya"],
+          scale: 16,
+        },
+      ],
+      sampling: [
+        {
+          id: "pest-interceptions",
+          title: "Pest / Disease Interceptions",
+          kind: "bar",
+          categories: [
+            "Fruit fly",
+            "False codling moth",
+            "Thrips",
+            "Bacterial wilt",
+          ],
+          scale: 10,
+        },
+      ],
+    },
+
     seed: {
       facilityPrefixes: [
         "Kigali",
@@ -25,13 +151,13 @@ export const farmProductsContent: UnitContentSpec = {
         "Seed Farm",
         "Seed Producers Ltd",
         "Multiplication Site",
-        "Agri Seed Co.",
+        "Potato Store",
       ],
       classifications: [
-        "Seed Producer",
-        "Seed Multiplier",
-        "Seed Processor",
-        "Seed Distributor",
+        "Producer Onsite Verification",
+        "Field Inspection",
+        "Potato Seed Store Inspection",
+        "Seed Sampling",
       ],
       workloadScale: 42,
       activities: [
@@ -44,11 +170,10 @@ export const farmProductsContent: UnitContentSpec = {
           scale: 24,
         },
         {
-          id: "crop-quality",
-          title: "Crop Quality Assessment",
-          caption: "Field quality rating at inspection",
+          id: "seed-decisions",
+          title: "Field Inspection Decisions",
           kind: "donut",
-          categories: ["Excellent", "Good", "Fair", "Below Standard"],
+          categories: ["Approved", "Downgraded", "Rejected", "Inspection ongoing"],
           scale: 30,
         },
       ],
@@ -61,11 +186,11 @@ export const farmProductsContent: UnitContentSpec = {
           scale: 18,
         },
         {
-          id: "samples-by-variety",
-          title: "Samples Collected by Variety",
-          kind: "bar",
-          categories: ["RHM-1402", "SB-24", "Gasore", "Ngwinurare", "Kigega"],
-          scale: 12,
+          id: "certification-type",
+          title: "Sample Certification Type",
+          kind: "donut",
+          categories: ["National", "ISTA"],
+          scale: 16,
         },
       ],
     },
@@ -106,7 +231,7 @@ export const farmProductsContent: UnitContentSpec = {
           id: "licensing-outcomes",
           title: "Licensing Outcomes",
           kind: "donut",
-          categories: ["Licensed", "Conditional", "Refused"],
+          categories: ["Qualifies for License", "Rejected"],
           scale: 26,
         },
       ],
@@ -116,120 +241,27 @@ export const farmProductsContent: UnitContentSpec = {
           title: "Product Samples Collected by Category",
           kind: "bar",
           categories: [
-            "Fertilizers",
             "Pesticides",
-            "Veterinary Drugs",
-            "Animal Feeds",
+            "Fertilizers",
+            "Seeds treatment",
+            "Other",
           ],
           scale: 14,
         },
       ],
     },
-
-    slaughterhouse: {
-      facilityPrefixes: ["Nyabugogo", "Gikondo", "Musanze", "Rwamagana", "Huye"],
-      facilitySuffixes: [
-        "Abattoir",
-        "Slaughterhouse",
-        "Meat Processing Ltd",
-        "Livestock Facility",
-      ],
-      classifications: ["Small", "Medium", "Large"],
-      workloadScale: 28,
-      activities: [
-        {
-          id: "slaughterhouses-by-classification",
-          title: "Slaughterhouses Inspected by Classification",
-          caption: "Facility size at time of inspection",
-          kind: "bar",
-          categories: ["Small", "Medium", "Large"],
-          scale: 16,
-        },
-        {
-          id: "slaughterhouse-outcomes",
-          title: "Inspection Outcomes",
-          kind: "donut",
-          categories: ["Approved", "Corrective Action", "Rejected"],
-          scale: 22,
-        },
-      ],
-      sampling: [],
-    },
-
-    butchery: {
-      facilityPrefixes: ["Kimironko", "Remera", "Nyamirambo", "Kicukiro", "Musanze"],
-      facilitySuffixes: [
-        "Butchery",
-        "Meat Shop",
-        "Fresh Meat Ltd",
-        "Butchery & Grill",
-      ],
-      classifications: ["Standard", "Premium", "Market Stall"],
-      workloadScale: 34,
-      activities: [
-        {
-          id: "butcheries-inspected",
-          title: "Butcheries Inspected by District",
-          kind: "bar",
-          categories: ["Gasabo", "Kicukiro", "Nyarugenge", "Musanze", "Rubavu"],
-          scale: 18,
-        },
-        {
-          id: "butchery-outcomes",
-          title: "Inspection Outcomes",
-          kind: "donut",
-          categories: ["Approved", "Corrective Action", "Rejected"],
-          scale: 24,
-        },
-      ],
-      sampling: [],
-    },
-
-    "meat-carrier": {
-      facilityPrefixes: ["RAB", "Kigali", "Eastern", "Northern", "Western"],
-      facilitySuffixes: [
-        "Meat Transport",
-        "Cold Chain Ltd",
-        "Carrier Services",
-        "Logistics Co.",
-      ],
-      classifications: ["Refrigerated Van", "Insulated Truck", "Motorcycle Box"],
-      workloadScale: 22,
-      activities: [
-        {
-          id: "vehicles-inspected",
-          title: "Vehicles Inspected by Type",
-          kind: "bar",
-          categories: ["Refrigerated Van", "Insulated Truck", "Motorcycle Box"],
-          scale: 14,
-        },
-        {
-          id: "carrier-outcomes",
-          title: "Inspection Outcomes",
-          kind: "donut",
-          categories: ["Approved", "Corrective Action", "Rejected"],
-          scale: 18,
-        },
-      ],
-      sampling: [],
-    },
   },
 
   futureModules: [
     {
-      id: "controlled-plot",
-      label: "Controlled Plot",
-      note: "Form design pending clarification",
+      id: "sample-tat",
+      label: "Average Sample Test Turnaround Time",
+      note: "Not available — no result-issued date field in FPU-FRM-035/036 (Seed Sampling).",
     },
     {
-      id: "seed-sampling-report",
-      label: "Seed Sampling Report",
-      note: "Awaiting agreed reporting fields",
-    },
-    {
-      id: "bean-data-collection",
-      label: "Bean Data Collection Sheet",
-      note: "Requires review before dashboard design",
+      id: "informal-registration",
+      label: "Registration Status — Informal / Unregistered",
+      note: "Cannot be derived from applicant records; requires a separate field-survey dataset.",
     },
   ],
 };

@@ -17,14 +17,29 @@ import type { ComplianceOutcome } from "@/types/dashboard";
 type ComplianceSummaryProps = {
   averageScore: number;
   outcomes: readonly ComplianceOutcome[];
+  lowestScore?: number;
+  highestScore?: number;
+  scoredCount?: number;
 };
 
 export function ComplianceSummary({
   averageScore,
   outcomes,
+  lowestScore,
+  highestScore,
+  scoredCount,
 }: ComplianceSummaryProps) {
+  const showScoreRange =
+    lowestScore != null && highestScore != null && scoredCount != null;
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
+    <div
+      className={
+        showScoreRange
+          ? "grid gap-6"
+          : "grid gap-6 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]"
+      }
+    >
       <SurfaceCard title="Average Compliance Score">
         <div className="flex flex-col gap-3 py-2">
           <p className="text-4xl font-semibold tracking-tight text-foreground">
@@ -41,9 +56,15 @@ export function ComplianceSummary({
               style={{ width: `${averageScore}%` }}
             />
           </div>
+          {showScoreRange ? (
+            <p className="text-xs leading-relaxed text-muted">
+              Lowest {lowestScore}% · Highest {highestScore}% · n = {scoredCount}
+            </p>
+          ) : null}
         </div>
       </SurfaceCard>
 
+      {showScoreRange ? null : (
       <ChartCard title="Inspection Outcomes" showPeriodSelect={false}>
 
         <div className="h-52 w-full">
@@ -85,6 +106,7 @@ export function ComplianceSummary({
           </ResponsiveContainer>
         </div>
       </ChartCard>
+      )}
     </div>
   );
 }

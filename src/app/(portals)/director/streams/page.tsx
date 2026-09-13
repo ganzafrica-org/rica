@@ -12,7 +12,7 @@ export default async function DirectorStreamsIndexPage() {
 
   // FPU / RLU / IIU open deep-dives from the sidebar dropdown.
   if (!user?.unit || user.unit === "fpu") {
-    redirect("/director/streams/seed");
+    redirect("/director/streams/livestock/slaughterhouse");
   }
   if (user.unit === "rlu") {
     redirect("/director/streams/seed-producers");

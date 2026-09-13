@@ -24,7 +24,9 @@ import type {
   ActivityChart,
   AssignedFacility,
   InspectorDashboardData,
+  InspectorPendingSection,
   KpiCard,
+  PendingInspectionRow,
   TrendPoint,
 } from "@/types/dashboard";
 import type { AccentKey, ServiceKey, UnitKey } from "@/types";
@@ -35,6 +37,127 @@ const registrationStatuses: StatusKey[] = [
   "pending",
   "not-started",
 ];
+
+const pendingStatuses: StatusKey[] = ["pending", "not-started", "ongoing"];
+
+const livestockTypes = [
+  "Slaughterhouse",
+  "Butchery",
+  "Meat Carrier",
+  "Feed Retailer",
+  "Feed Processing Unit",
+  "Beekeeper Cooperative",
+  "Honey Collection Center",
+  "Honey Processing Unit",
+  "Milk Collection Center",
+  "Milk Kiosk",
+  "MAP",
+] as const;
+
+const plantCommodities = [
+  "Coffee",
+  "Tea",
+  "Chili",
+  "Cut flowers",
+  "Fresh fruit",
+] as const;
+
+const destinations = ["UAE", "Netherlands", "UK", "Belgium", "Kenya"] as const;
+
+const seedStages = [
+  "Producer Onsite Verification",
+  "Field Inspection",
+  "Potato Seed Store Inspection",
+  "Seed Sampling",
+] as const;
+
+const seedCrops = [
+  "Maize · RHM-1402",
+  "Beans · Gasore",
+  "Soybean · SB-24",
+  "Irish Potato · Ngwinurare",
+  "Rice · Kigega",
+] as const;
+
+const dealerCategories = [
+  "Importer",
+  "Distributor",
+  "Retailer",
+  "Manufacturer",
+  "Exporter",
+] as const;
+
+function buildPendingRows(
+  seedPrefix: string,
+  count: number,
+  buildRow: (rng: () => number, index: number) => Omit<PendingInspectionRow, "id" | "status" | "district">,
+): PendingInspectionRow[] {
+  return Array.from({ length: count }, (_, index) => {
+    const rng = rngFromString(`${seedPrefix}:${index}`);
+    const fields = buildRow(rng, index);
+    return {
+      id: `${seedPrefix}-${index}`,
+      district: rngPick(rng, districts),
+      status: rngPick(rng, pendingStatuses),
+      ...fields,
+    };
+  });
+}
+
+function buildFpuPendingSections(
+  seedPrefix: string,
+  service: ServiceKey | "all",
+): InspectorPendingSection[] {
+  const sections: InspectorPendingSection[] = [
+    {
+      id: "livestock",
+      title: "Livestock inspection",
+      nameHeader: "Facility Name",
+      typeHeader: "Facility Type",
+      rows: buildPendingRows(`${seedPrefix}:livestock`, 16, (rng) => ({
+        name: `${rngPick(rng, ["Nyabugogo", "Gikondo", "Musanze", "Huye", "Kimironko"])} ${rngPick(rng, ["Abattoir", "Butchery", "Depot", "Centre"])}`,
+        type: rngPick(rng, livestockTypes),
+      })),
+    },
+    {
+      id: "plant-warehouse",
+      title: "Plant and warehouse Inspection",
+      nameHeader: "Exporter Name",
+      typeHeader: "Commodity",
+      extraHeader: "Destination Country",
+      rows: buildPendingRows(`${seedPrefix}:plant`, 14, (rng) => ({
+        name: `${rngPick(rng, ["Kigali", "Musanze", "Rubavu", "Rusumo"])} ${rngPick(rng, ["Exporters Ltd", "Packhouse", "Export Co."])}`,
+        type: rngPick(rng, plantCommodities),
+        extra: rngPick(rng, destinations),
+      })),
+    },
+    {
+      id: "seed",
+      title: "Seed Inspection",
+      nameHeader: "Producer / Field / Store",
+      typeHeader: "Crop & Variety",
+      extraHeader: "Visit Stage",
+      rows: buildPendingRows(`${seedPrefix}:seed`, 15, (rng) => ({
+        name: `${rngPick(rng, ["Kigali", "Musanze", "Nyagatare", "Karongi"])} ${rngPick(rng, ["Seed Cooperative", "Seed Farm", "Potato Store"])}`,
+        type: rngPick(rng, seedCrops),
+        extra: rngPick(rng, seedStages),
+      })),
+    },
+    {
+      id: "agrochemical",
+      title: "Agrochemical Inspection",
+      nameHeader: "Business Name",
+      typeHeader: "Dealer Category",
+      rows: buildPendingRows(`${seedPrefix}:agro`, 12, (rng) => ({
+        name: `${rngPick(rng, ["Kigali", "Rubavu", "Muhanga", "Huye"])} ${rngPick(rng, ["Agro Dealers", "Agrovet Ltd", "Farm Inputs Co."])}`,
+        type: rngPick(rng, dealerCategories),
+      })),
+    },
+  ];
+
+  if (service === "all") return sections;
+  return sections.filter((section) => section.id === service);
+}
 
 /** Accent for the current selection — the service's own, or RICA green. */
 function accentFor(unit: UnitKey, service: ServiceKey | "all"): AccentKey {
@@ -151,6 +274,12 @@ export function buildInspectorDashboard(args: {
     Math.round(assigned * 0.82),
   );
   const pending = assigned - completed;
+  const awaitingNext = rngInt(
+    rng,
+    Math.max(1, Math.round(pending * 0.35)),
+    Math.max(1, Math.round(pending * 0.7)),
+  );
+  const notStarted = Math.max(0, pending - awaitingNext);
 
   const kpis: KpiCard[] = [
     {
@@ -164,7 +293,10 @@ export function buildInspectorDashboard(args: {
       id: "pending",
       label: "Pending Inspections",
       value: String(pending),
-      hint: `${Math.round((pending / assigned) * 100)}% of assigned workload`,
+      hint:
+        unit === "fpu"
+          ? `${awaitingNext} awaiting next visit • ${notStarted} not yet started`
+          : `${Math.round((pending / assigned) * 100)}% of assigned workload`,
       tone: accent,
     },
     {
@@ -203,12 +335,26 @@ export function buildInspectorDashboard(args: {
 
   // Compliance
   const averageScore = rngInt(rng, 68, 94);
+  const lowestScore = rngInt(rng, 42, Math.min(67, averageScore - 4));
+  const highestScore = rngInt(rng, Math.max(averageScore + 2, 88), 98);
+  const scoredCount = Math.max(1, completed);
   const outcomeTotals = rngSplit(rng, completed, complianceOutcomeLabels.length);
   const outcomes = complianceOutcomeLabels.map((outcome, index) => ({
     outcome,
     count: outcomeTotals[index]!,
     color: complianceOutcomeColors[index]!,
   }));
+
+  if (unit === "fpu") {
+    kpis.push({
+      id: "compliance",
+      label: "Average Compliance Score",
+      value: `${averageScore}%`,
+      hint: `Lowest ${lowestScore}% · Highest ${highestScore}% · n = ${scoredCount}`,
+      tone: accent,
+      progress: averageScore,
+    });
+  }
 
   return {
     unit,
@@ -234,7 +380,15 @@ export function buildInspectorDashboard(args: {
       },
     },
     facilities,
-    compliance: { averageScore, outcomes },
+    pendingSections:
+      unit === "fpu" ? buildFpuPendingSections(seedPrefix, service) : [],
+    compliance: {
+      averageScore,
+      outcomes,
+      lowestScore,
+      highestScore,
+      scoredCount,
+    },
     activities: spec
       ? buildActivityCharts(spec.activities, `${seedPrefix}:activity`, accent)
       : [],

@@ -173,6 +173,14 @@ export function DirectorFilters({
           </>
         ) : (
           <>
+            {filterMode === "streams" ? (
+              <FilterSelect
+                label="Regulatory stream"
+                options={directorFilterOptions.streams}
+                selectedKey={current.stream}
+                onSelectionChange={(value) => onChange?.("stream", value)}
+              />
+            ) : null}
             <FilterSelect
               label="Province"
               options={provinces}

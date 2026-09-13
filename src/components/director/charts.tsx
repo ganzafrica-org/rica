@@ -56,7 +56,7 @@ export function DirectorLineChart({
   previousColor = chartColors[1],
 }: LineChartCardProps) {
   return (
-    <ChartCard title={title}>
+    <ChartCard title={title} caption={description}>
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
@@ -123,7 +123,7 @@ export function DirectorBarChart({
   colorOffset = 0,
 }: BarChartCardProps) {
   return (
-    <ChartCard title={title}>
+    <ChartCard title={title} caption={description}>
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
@@ -176,7 +176,7 @@ export function DirectorDonutChart({
   colorOffset = 0,
 }: DonutChartCardProps) {
   return (
-    <ChartCard title={title}>
+    <ChartCard title={title} caption={description}>
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -224,7 +224,7 @@ export function DirectorStackedBarChart({
   series,
 }: StackedBarCardProps) {
   return (
-    <ChartCard title={title}>
+    <ChartCard title={title} caption={description}>
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
@@ -270,7 +270,7 @@ export function DirectorGroupedBarChart({
   series,
 }: StackedBarCardProps) {
   return (
-    <ChartCard title={title}>
+    <ChartCard title={title} caption={description}>
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
