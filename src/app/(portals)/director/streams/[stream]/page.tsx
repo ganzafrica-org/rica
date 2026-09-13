@@ -43,6 +43,14 @@ export default async function DirectorDeepDivePage({ params }: PageProps) {
   const { stream } = await params;
   const user = await getSessionUser();
 
+  const legacyFpuStreams: Record<string, string> = {
+    slaughterhouse: "/director/streams/livestock/slaughterhouse",
+    "seed-producer": "/director/streams/seed/producer-verification",
+  };
+  if (user?.unit === "fpu" && legacyFpuStreams[stream]) {
+    redirect(legacyFpuStreams[stream]);
+  }
+
   // RLU licensing categories (sidebar dropdown)
   if (user?.unit === "rlu") {
     if (!isDirectorCategoryId(stream)) notFound();

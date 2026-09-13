@@ -124,12 +124,13 @@ export function SeniorInspectorsView() {
     ];
   }, [filtered]);
 
-  const tableRows: TeamMemberRow[] = filtered.map(
-    ({ unit: _unit, unitLabel, ...member }) => ({
-      ...member,
-      name: unitFilter === "all" ? `${member.name} · ${unitLabel}` : member.name,
-    }),
-  );
+  const tableRows: TeamMemberRow[] = filtered.map((row) => ({
+    name: unitFilter === "all" ? `${row.name} · ${row.unitLabel}` : row.name,
+    assigned: row.assigned,
+    completed: row.completed,
+    pending: row.pending,
+    completionRate: row.completionRate,
+  }));
 
   const filterOptions: { id: UnitFilter; label: string }[] = [
     { id: "all", label: "All" },

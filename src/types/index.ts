@@ -1,10 +1,3 @@
-/** @deprecated Superseded by ServiceKey. Kept for the director stream views. */
-export type StreamKey =
-  | "seed"
-  | "slaughterhouse"
-  | "agrochemical"
-  | "seed-producer";
-
 export type UserRole = "inspector" | "director" | "senior-director";
 
 /** The four RICA organisational units. */
@@ -18,11 +11,13 @@ export type UnitKey = BusinessUnitKey;
  * per unit so a single key identifies itself globally.
  */
 export type ServiceKey =
+  | "livestock"
+  | "plant-warehouse"
   | "seed"
-  | "agrochemical"
-  | "slaughterhouse"
-  | "butchery"
-  | "meat-carrier";
+  | "agrochemical";
+
+/** @deprecated Use ServiceKey. */
+export type StreamKey = ServiceKey;
 
 /** Rwanda's five provinces. */
 export type ProvinceKey = "kigali" | "north" | "south" | "east" | "west";
@@ -57,6 +52,7 @@ export type NavIcon =
   | "producer"
   | "butchery"
   | "meat-carrier"
+  | "warehouse"
   | "facilities"
   | "activity"
   | "reports"
@@ -72,13 +68,6 @@ export type NavItem = {
   icon?: NavIcon;
   /** Nested sidebar items (dropdown group). */
   children?: NavItem[];
-};
-
-/** @deprecated Superseded by ServiceDefinition. */
-export type StreamNavItem = NavItem & {
-  id: StreamKey;
-  formCode: string;
-  description: string;
 };
 
 export type ServiceDefinition = {

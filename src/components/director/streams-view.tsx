@@ -24,6 +24,7 @@ import {
   directorCategoryLabels,
   directorProductCategoryLabels,
   directorProductLabel,
+  directorStreamFacilityLabel,
   directorStreamLabels,
   streamPageCopy,
   type DirectorCategoryId,
@@ -40,6 +41,8 @@ type DirectorStreamsViewProps = {
   productCategoryId?: DirectorProductCategoryId;
   /** When set (IIU nested product), lock to this product name. */
   productNameId?: string;
+  /** When set (FPU nested facility / checklist type). */
+  streamFacilityId?: string;
 };
 
 export function DirectorStreamsView({
@@ -47,6 +50,7 @@ export function DirectorStreamsView({
   categoryId,
   productCategoryId,
   productNameId,
+  streamFacilityId,
 }: DirectorStreamsViewProps) {
   const { user } = useAuth();
   const unitKey = user?.unit ?? "fpu";
@@ -98,10 +102,30 @@ export function DirectorStreamsView({
     "general-missing",
   ]);
   const isGeneralCategory = productCategoryId === "general";
+  const fpuStreamChartIds: Record<DirectorStreamId, readonly string[]> = {
+    livestock: [
+      "livestock-decisions",
+      "livestock-value-chain",
+      "livestock-size",
+    ],
+    "plant-warehouse": [
+      "plant-warehouse",
+      "plant-warehouse-commodity",
+      "plant-warehouse-pests",
+    ],
+    seed: ["seed", "seed-producer", "seed-potato"],
+    agrochemical: ["agrochemical", "agrochemical-product"],
+  };
   const sections = filtered.sectionCharts.filter((section) => {
     if (dashboardOnlySectionIds.has(section.id)) return false;
     if (isGeneralCategory) return generalChartIds.has(section.id);
     if (productCategoryId) return !generalChartIds.has(section.id);
+    if (unitKey === "fpu" && streamId) {
+      return (
+        section.id === streamId ||
+        fpuStreamChartIds[streamId].includes(section.id)
+      );
+    }
     return !generalChartIds.has(section.id);
   });
   // Stream/licensing category chosen in sidebar — geo/date only.
@@ -116,7 +140,14 @@ export function DirectorStreamsView({
         ? "iiu"
         : data.filterMode;
 
-  const pageTitle = streamId
+  const facilityLabel =
+    streamId && streamFacilityId
+      ? directorStreamFacilityLabel(streamId, streamFacilityId)
+      : undefined;
+
+  const pageTitle = facilityLabel
+    ? facilityLabel
+    : streamId
     ? directorStreamLabels[streamId]
     : categoryId
       ? `${directorCategoryLabels[categoryId]} overview`
@@ -222,7 +253,14 @@ export function DirectorStreamsView({
 
   return (
     <PageTransition className="space-y-6">
-      <PageTitle title={pageTitle} />
+      <PageTitle
+        title={pageTitle}
+        description={
+          facilityLabel && streamId
+            ? directorStreamLabels[streamId]
+            : undefined
+        }
+      />
       <DirectorFilters
         filterMode={filterMode}
         values={activeFilters}
@@ -238,7 +276,9 @@ export function DirectorStreamsView({
 
       {(streamId || productCategoryId) && kpiSections.length > 0 ? (
         <DirectorKpiGrid
-          items={kpiSections.flatMap((section) => section.kpis ?? [])}
+          items={kpiSections
+            .flatMap((section) => section.kpis ?? [])
+            .slice(0, 5)}
         />
       ) : null}
 
@@ -246,7 +286,6 @@ export function DirectorStreamsView({
         <div className="grid gap-6 lg:grid-cols-2">{charts}</div>
       ) : (
         <section className="space-y-2">
-          <h2 className="rica-title text-foreground">Unit-specific KPIs</h2>
           <p className="rica-caption">
             {streamId ||
             categoryId ||

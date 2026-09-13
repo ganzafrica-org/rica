@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { ActivityCharts } from "@/components/shared/activity-charts";
 import { ServiceFilter } from "@/components/shared/service-filter";
-import { PageTitle } from "@/components/layout/page-title";
 import { ContentSwap, PageTransition } from "@/components/motion/page-transition";
 import { SurfaceCard } from "@/components/ui/surface-card";
 import { buildInspectorDashboard } from "@/data/generators/inspector-dashboard";
@@ -27,12 +26,10 @@ export function ActivitiesView({
     [unitId, service],
   );
 
-  const hasContent = data.activities.length > 0 || data.sampling.length > 0;
+  const charts = [...data.activities, ...data.sampling];
 
   return (
     <PageTransition className="space-y-6">
-      <PageTitle title="Inspection Activities" />
-
       <ServiceFilter
         services={services}
         value={service}
@@ -40,27 +37,9 @@ export function ActivitiesView({
       />
 
       <ContentSwap motionKey={service} className="space-y-6">
-        {data.activities.length > 0 ? (
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold tracking-tight text-foreground">
-              Inspection Activities
-            </h3>
-            <ActivityCharts charts={data.activities} />
-          </section>
-        ) : null}
+        {charts.length > 0 ? <ActivityCharts charts={charts} /> : null}
 
-        {data.sampling.length > 0 ? (
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold tracking-tight text-foreground">
-              Sampling Activities
-            </h3>
-            <ActivityCharts charts={data.sampling} />
-          </section>
-        ) : null}
-
-        {!hasContent ? (
-          <SurfaceCard title="No activity data" />
-        ) : null}
+        {charts.length === 0 ? <SurfaceCard title="No activity data" /> : null}
       </ContentSwap>
     </PageTransition>
   );

@@ -15,18 +15,17 @@ Authority), covering all three actors from the KPI framework: **Inspectors**,
 ### Inspector portal — all 4 units
 
 - `/inspector` renders the signed-in inspector's unit
-- 7-section dashboard per the KPI spec: Workload Summary, Inspection Progress,
-  Assigned Facilities, Compliance Summary, Inspection Activities, Sampling
-  Activities, Future Modules
-- Farm Products' 5 services (Seed, Agrochemical, Slaughterhouse, Butchery,
-  Meat Carrier) act as **filters** across every section
-- Assigned Facilities and Inspection Activities also have full pages
+- Workload KPIs (including Average Compliance Score on Farm Products), progress
+  donut + trend, and unit activity charts
+- Farm Products uses **4 regulatory streams**: Livestock, Plant and warehouse,
+  Seed, and Agrochemical, with facility types nested under each stream
+- Assigned Facilities and Inspection Activities have their own pages
 
-### Director portal — unit-scoped (KPI framework Rev. 2)
+### Director portal — unit-scoped (KPI framework Rev. 3)
 
 - Dashboard, Team, and per-unit deep dives (streams / categories / products)
-- Nested sidebar navigation driven by the director's unit
-- Date-range and province filters
+- Farm Products sidebar nests facility/checklist types under the 4 streams
+- Date-range, province, and district filters
 
 ### Senior Director — executive dashboard
 
@@ -35,7 +34,8 @@ Authority), covering all three actors from the KPI framework: **Inspectors**,
   Director Dashboards
 - **Leaflet + OpenStreetMap** map of registered entities across all 30 Rwandan
   districts, sized by volume and filterable by category, province and district
-- Per-unit drill-down at `/senior-director/units/[unit]`
+- One summary page per unit at `/senior-director/units/[unit]` (no Farm Products
+  stream dropdowns)
 
 > **KPI provenance:** Farm Products follows the source spec exactly. Registration
 > & Licensing is derived from that unit's Director-level sections. Market

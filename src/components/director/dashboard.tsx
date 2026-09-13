@@ -24,6 +24,13 @@ import {
 } from "@/data/director/dashboard";
 import { businessUnits } from "@/data/units";
 
+/** Decision charts on the FPU unit dashboard — not the full subunit catalogue. */
+const fpuDashboardChartIds = [
+  "livestock-decisions",
+  "plant-warehouse",
+  "seed",
+] as const;
+
 /** Unit-wide IMU bar charts on the dashboard (§3.2). */
 const imuDashboardChartIds = new Set(["business", "assessment"]);
 
@@ -94,6 +101,15 @@ export function DirectorDashboard() {
         )
       : [];
 
+  const fpuHeadlineKpis =
+    unitKey === "fpu" ? filtered.sectionOverviewKpis.slice(0, 5) : [];
+  const fpuDecisionCharts =
+    unitKey === "fpu"
+      ? filtered.sectionCharts.filter((section) =>
+          (fpuDashboardChartIds as readonly string[]).includes(section.id),
+        )
+      : [];
+
   // Category / IMU deep-dives use the sidebar; IIU keeps full §4.2 filters here.
   const dashboardFilterMode =
     data.filterMode === "categories" || data.filterMode === "imu"
@@ -110,6 +126,16 @@ export function DirectorDashboard() {
           key={section.id}
           title={section.title}
           data={section.bars}
+          colorOffset={index}
+        />
+      );
+    }
+    if (section.donut && section.donut.length > 0) {
+      return (
+        <DirectorDonutChart
+          key={section.id}
+          title={section.title}
+          data={section.donut}
           colorOffset={index}
         />
       );
@@ -227,13 +253,37 @@ export function DirectorDashboard() {
         </div>
       ) : null}
 
-      {data.showOutcomes ? (
+      {fpuHeadlineKpis.length > 0 ? (
+        <DirectorKpiGrid items={fpuHeadlineKpis} />
+      ) : null}
+
+      {unitKey === "fpu" ? (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <DirectorDonutChart
+            title="Unit-wide outcome mix"
+            data={filtered.outcomes}
+          />
+          <DirectorStackedBarChart
+            title="Outcomes by regulatory stream"
+            data={filtered.outcomesByStream ?? []}
+            series={stackedOutcomeSeries}
+          />
+          <DirectorLineChart
+            title="Average compliance score"
+            data={filtered.complianceTrend}
+            valueLabel="Score"
+            color={chartColors[0]}
+          />
+          {fpuDecisionCharts.map((section, index) =>
+            renderSectionChart(section, index + 1),
+          )}
+        </div>
+      ) : data.showOutcomes ? (
         <section className="space-y-4">
-          <h2 className="rica-title text-foreground">Regulatory outcomes</h2>
           <div className="grid gap-6 lg:grid-cols-2">
             {data.outcomesChart === "donut" ? (
               <DirectorDonutChart
-                title="The outcomes of my unit's activities"
+                title="Unit-wide outcome mix"
                 data={filtered.outcomes}
               />
             ) : (
@@ -263,26 +313,27 @@ export function DirectorDashboard() {
         <SurfaceCard title="Regulatory outcomes" />
       )}
 
-      <section className="space-y-4">
-        <h2 className="rica-title text-foreground">Performance trends</h2>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <DirectorLineChart
-            title={trendTitle}
-            data={trendData}
-            valueLabel={trendLabel}
-            color={chartColors[0]}
-          />
-          <DirectorLineChart
-            title="Year-on-year comparison"
-            data={filtered.yoyTrend}
-            showPrevious
-            valueLabel="This year"
-            previousLabel="Last year"
-            color={chartColors[2]}
-            previousColor={chartColors[3]}
-          />
-        </div>
-      </section>
+      {unitKey === "fpu" ? null : (
+        <section className="space-y-4">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <DirectorLineChart
+              title={trendTitle}
+              data={trendData}
+              valueLabel={trendLabel}
+              color={chartColors[0]}
+            />
+            <DirectorLineChart
+              title="Year-on-year comparison"
+              data={filtered.yoyTrend}
+              showPrevious
+              valueLabel="This year"
+              previousLabel="Last year"
+              color={chartColors[2]}
+              previousColor={chartColors[3]}
+            />
+          </div>
+        </section>
+      )}
     </PageTransition>
   );
 }

@@ -14,28 +14,121 @@ export const directorNavByUnit: Record<BusinessUnitKey, NavItem[]> = {
       icon: "layers",
       children: [
         {
+          href: "/director/streams/livestock",
+          label: "Livestock inspection",
+          shortLabel: "Livestock",
+          icon: "slaughterhouse",
+          children: [
+            {
+              href: "/director/streams/livestock/slaughterhouse",
+              label: "Slaughterhouse",
+              icon: "slaughterhouse",
+            },
+            {
+              href: "/director/streams/livestock/butchery",
+              label: "Butchery",
+              icon: "butchery",
+            },
+            {
+              href: "/director/streams/livestock/meat-carrier",
+              label: "Meat Carrier",
+              icon: "meat-carrier",
+            },
+            {
+              href: "/director/streams/livestock/feed-retailer",
+              label: "Feed Retailer",
+              icon: "facilities",
+            },
+            {
+              href: "/director/streams/livestock/feed-processing",
+              label: "Feed Processing Unit",
+              icon: "facilities",
+            },
+            {
+              href: "/director/streams/livestock/beekeeper",
+              label: "Beekeeper Cooperative",
+              icon: "layers",
+            },
+            {
+              href: "/director/streams/livestock/honey-collection",
+              label: "Honey Collection Center",
+              icon: "layers",
+            },
+            {
+              href: "/director/streams/livestock/honey-processing",
+              label: "Honey Processing Unit",
+              icon: "layers",
+            },
+            {
+              href: "/director/streams/livestock/milk-collection",
+              label: "Milk Collection Center",
+              icon: "layers",
+            },
+            {
+              href: "/director/streams/livestock/milk-kiosk",
+              label: "Milk Kiosk",
+              icon: "facilities",
+            },
+            {
+              href: "/director/streams/livestock/map",
+              label: "MAP",
+              icon: "map",
+            },
+          ],
+        },
+        {
+          href: "/director/streams/plant-warehouse",
+          label: "Plant and warehouse Inspection",
+          shortLabel: "Plant & warehouse",
+          icon: "warehouse",
+          children: [
+            {
+              href: "/director/streams/plant-warehouse/phytosanitary",
+              label: "Phytosanitary Export",
+              icon: "warehouse",
+            },
+          ],
+        },
+        {
           href: "/director/streams/seed",
           label: "Seed Inspection",
           shortLabel: "Seed",
           icon: "seed",
-        },
-        {
-          href: "/director/streams/slaughterhouse",
-          label: "Slaughterhouse",
-          shortLabel: "Slaughter",
-          icon: "slaughterhouse",
+          children: [
+            {
+              href: "/director/streams/seed/producer-verification",
+              label: "Producer Onsite Verification",
+              icon: "producer",
+            },
+            {
+              href: "/director/streams/seed/field-inspection",
+              label: "Field Inspection",
+              icon: "seed",
+            },
+            {
+              href: "/director/streams/seed/potato-seed-store",
+              label: "Potato Seed Store Inspection",
+              icon: "warehouse",
+            },
+            {
+              href: "/director/streams/seed/seed-sampling",
+              label: "Seed Sampling",
+              icon: "activity",
+            },
+          ],
         },
         {
           href: "/director/streams/agrochemical",
-          label: "Agrochemical",
-          shortLabel: "Agrochem",
+          label: "Agrochemical Inspection",
+          shortLabel: "Agrochemical",
           icon: "agrochemical",
-        },
-        {
-          href: "/director/streams/seed-producer",
-          label: "Seed Producer",
-          shortLabel: "Producer",
-          icon: "producer",
+          children: [
+            {
+              href: "/director/streams/agrochemical/dealership",
+              label: "Agrochemical Dealership Licensing",
+              icon: "agrochemical",
+            },
+          ],
         },
       ],
     },
@@ -199,26 +292,118 @@ export const directorNavByUnit: Record<BusinessUnitKey, NavItem[]> = {
 };
 
 export const directorStreamLabels: Record<
-  "seed" | "slaughterhouse" | "agrochemical" | "seed-producer",
+  "livestock" | "plant-warehouse" | "seed" | "agrochemical",
   string
 > = {
-  seed: "Seed Inspection & Certification",
-  slaughterhouse: "Slaughterhouse Inspection",
-  agrochemical: "Agrochemical Dealership Licensing",
-  "seed-producer": "Seed Producer Onsite Verification",
+  livestock: "Livestock inspection",
+  "plant-warehouse": "Plant and warehouse Inspection",
+  seed: "Seed Inspection",
+  agrochemical: "Agrochemical Inspection",
 };
 
 export const directorStreamIds = [
+  "livestock",
+  "plant-warehouse",
   "seed",
-  "slaughterhouse",
   "agrochemical",
-  "seed-producer",
 ] as const;
 
 export type DirectorStreamId = (typeof directorStreamIds)[number];
 
 export function isDirectorStreamId(value: string): value is DirectorStreamId {
   return (directorStreamIds as readonly string[]).includes(value);
+}
+
+/** Facility / checklist types nested under each FPU subunit. */
+export const directorStreamFacilities: Record<
+  DirectorStreamId,
+  readonly { id: string; label: string }[]
+> = {
+  livestock: [
+    { id: "slaughterhouse", label: "Slaughterhouse" },
+    { id: "butchery", label: "Butchery" },
+    { id: "meat-carrier", label: "Meat Carrier" },
+    { id: "feed-retailer", label: "Feed Retailer" },
+    { id: "feed-processing", label: "Feed Processing Unit" },
+    { id: "beekeeper", label: "Beekeeper Cooperative" },
+    { id: "honey-collection", label: "Honey Collection Center" },
+    { id: "honey-processing", label: "Honey Processing Unit" },
+    { id: "milk-collection", label: "Milk Collection Center" },
+    { id: "milk-kiosk", label: "Milk Kiosk" },
+    { id: "map", label: "MAP" },
+  ],
+  "plant-warehouse": [
+    { id: "phytosanitary", label: "Phytosanitary Export" },
+  ],
+  seed: [
+    { id: "producer-verification", label: "Producer Onsite Verification" },
+    { id: "field-inspection", label: "Field Inspection" },
+    { id: "potato-seed-store", label: "Potato Seed Store Inspection" },
+    { id: "seed-sampling", label: "Seed Sampling" },
+  ],
+  agrochemical: [
+    { id: "dealership", label: "Agrochemical Dealership Licensing" },
+  ],
+};
+
+export function isDirectorStreamFacilityId(
+  streamId: DirectorStreamId,
+  value: string,
+): boolean {
+  return directorStreamFacilities[streamId].some(
+    (facility) => facility.id === value,
+  );
+}
+
+export function directorStreamFacilityLabel(
+  streamId: DirectorStreamId,
+  facilityId: string,
+): string | undefined {
+  return directorStreamFacilities[streamId].find(
+    (facility) => facility.id === facilityId,
+  )?.label;
+}
+
+const fpuStreamIcons: Record<DirectorStreamId, NavItem["icon"]> = {
+  livestock: "slaughterhouse",
+  "plant-warehouse": "warehouse",
+  seed: "seed",
+  agrochemical: "agrochemical",
+};
+
+const fpuFacilityIcons: Record<string, NonNullable<NavItem["icon"]>> = {
+  slaughterhouse: "slaughterhouse",
+  butchery: "butchery",
+  "meat-carrier": "meat-carrier",
+  "feed-retailer": "facilities",
+  "feed-processing": "facilities",
+  beekeeper: "layers",
+  "honey-collection": "layers",
+  "honey-processing": "layers",
+  "milk-collection": "layers",
+  "milk-kiosk": "facilities",
+  map: "map",
+  phytosanitary: "warehouse",
+  "producer-verification": "producer",
+  "field-inspection": "seed",
+  "potato-seed-store": "warehouse",
+  "seed-sampling": "activity",
+  dealership: "agrochemical",
+};
+
+/** Same FPU subunit tree for director and inspector sidebars. */
+export function fpuStreamNavItems(basePath: string): NavItem[] {
+  return directorStreamIds.map((streamId) => ({
+    href: `${basePath}/${streamId}`,
+    label: directorStreamLabels[streamId],
+    shortLabel: directorStreamLabels[streamId],
+    icon: fpuStreamIcons[streamId],
+    children: directorStreamFacilities[streamId].map((facility) => ({
+      href: `${basePath}/${streamId}/${facility.id}`,
+      label: facility.label,
+      icon: fpuFacilityIcons[facility.id] ?? "layers",
+    })),
+  }));
 }
 
 export const directorCategoryIds = [
@@ -345,6 +530,21 @@ export const inspectorNav: NavItem[] = [
   { href: "/inspector/reports", label: "Reports", icon: "reports" },
 ];
 
+export function getInspectorNav(unit?: BusinessUnitKey): NavItem[] {
+  if (unit !== "fpu") return inspectorNav;
+
+  return [
+    inspectorNav[0]!,
+    {
+      href: "/inspector/streams",
+      label: "Regulatory streams",
+      icon: "layers",
+      children: fpuStreamNavItems("/inspector/streams"),
+    },
+    ...inspectorNav.slice(1),
+  ];
+}
+
 export const seniorDirectorNav: NavItem[] = [
   { href: "/senior-director", label: "Dashboard", icon: "dashboard" },
   {
@@ -396,7 +596,7 @@ export function getNavForUser(user: {
   role: UserRole;
   unit?: BusinessUnitKey;
 }): NavItem[] {
-  if (user.role === "inspector") return inspectorNav;
+  if (user.role === "inspector") return getInspectorNav(user.unit);
   if (user.role === "senior-director") return seniorDirectorNav;
   return getDirectorNav(user.unit);
 }
@@ -408,7 +608,7 @@ export const streamPageCopy: Record<
   fpu: {
     title: "Regulatory streams",
     description:
-      "Seed, slaughterhouse, agrochemical, and seed-producer performance (§1.2).",
+      "Livestock, plant and warehouse, seed, and agrochemical inspection (§1.2).",
   },
   rlu: {
     title: "Licensing categories",

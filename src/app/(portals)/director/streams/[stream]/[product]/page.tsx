@@ -4,8 +4,12 @@ import { DirectorStreamsView } from "@/components/director";
 import {
   directorProductCategoryLabels,
   directorProductLabel,
+  directorStreamFacilityLabel,
+  directorStreamLabels,
   isDirectorProductCategoryId,
   isDirectorProductId,
+  isDirectorStreamFacilityId,
+  isDirectorStreamId,
 } from "@/data/navigation";
 import { getSessionUser } from "@/lib/session";
 
@@ -19,6 +23,17 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { stream, product } = await params;
+  const user = await getSessionUser();
+
+  if (user?.unit === "fpu" && isDirectorStreamId(stream)) {
+    const facility = directorStreamFacilityLabel(stream, product);
+    return {
+      title: facility
+        ? `${facility} · ${directorStreamLabels[stream]}`
+        : directorStreamLabels[stream],
+    };
+  }
+
   if (!isDirectorProductCategoryId(stream)) return { title: "Import operations" };
   const label = directorProductLabel(stream, product);
   return {
@@ -28,9 +43,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function DirectorImportProductPage({ params }: PageProps) {
+export default async function DirectorNestedStreamPage({ params }: PageProps) {
   const { stream, product } = await params;
   const user = await getSessionUser();
+
+  if (user?.unit === "fpu") {
+    if (!isDirectorStreamId(stream)) notFound();
+    if (!isDirectorStreamFacilityId(stream, product)) notFound();
+    return (
+      <DirectorStreamsView streamId={stream} streamFacilityId={product} />
+    );
+  }
 
   if (user?.unit !== "iiu") notFound();
   if (!isDirectorProductCategoryId(stream)) notFound();

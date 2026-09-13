@@ -9,10 +9,10 @@ export const directorFilterOptions = {
   ],
   streams: [
     { id: "all", label: "All streams" },
+    { id: "livestock", label: "Livestock inspection" },
+    { id: "plant-warehouse", label: "Plant and warehouse Inspection" },
     { id: "seed", label: "Seed Inspection" },
-    { id: "slaughterhouse", label: "Slaughterhouse" },
-    { id: "agrochemical", label: "Agrochemical" },
-    { id: "seed-producer", label: "Seed Producer" },
+    { id: "agrochemical", label: "Agrochemical Inspection" },
   ],
   categories: [
     { id: "all", label: "All categories" },
@@ -282,10 +282,15 @@ export const directorDashboards: Record<BusinessUnitKey, DirectorUnitDashboard> 
         { name: "Western", cleared: 20, corrective: 10, rejected: 5 },
       ],
       outcomesByStream: [
-        { name: "Seed", cleared: 58, corrective: 22, rejected: 9 },
-        { name: "Slaughterhouse", cleared: 36, corrective: 18, rejected: 11 },
-        { name: "Agrochemical", cleared: 30, corrective: 12, rejected: 6 },
-        { name: "Seed Producer", cleared: 24, corrective: 10, rejected: 5 },
+        { name: "Livestock inspection", cleared: 62, corrective: 28, rejected: 14 },
+        {
+          name: "Plant and warehouse Inspection",
+          cleared: 38,
+          corrective: 16,
+          rejected: 8,
+        },
+        { name: "Seed Inspection", cleared: 32, corrective: 12, rejected: 6 },
+        { name: "Agrochemical Inspection", cleared: 16, corrective: 6, rejected: 3 },
       ],
       complianceTrend: [
         { month: "Jan", value: 78 },
@@ -307,12 +312,193 @@ export const directorDashboards: Record<BusinessUnitKey, DirectorUnitDashboard> 
         { month: "Jul", value: 69, previous: 62 },
         { month: "Aug", value: 74, previous: 65 },
       ],
-      sectionOverviewKpis: [],
+      sectionOverviewKpis: [
+        {
+          id: "livestock-compliance",
+          label: "Unit compliance rate",
+          value: "76%",
+          hint: "Livestock inspection",
+          tone: "slaughterhouse",
+        },
+        {
+          id: "consignments",
+          label: "Consignments reviewed",
+          value: "186",
+          hint: "Plant and warehouse Inspection",
+          tone: "seed-producer",
+        },
+        {
+          id: "apps",
+          label: "Applications submitted",
+          value: "214",
+          hint: "Seed Inspection",
+          tone: "seed",
+        },
+        {
+          id: "approval",
+          label: "Approval rate",
+          value: "68%",
+          hint: "Seed Inspection",
+          tone: "agrochemical",
+        },
+        {
+          id: "agrochemical-pass",
+          label: "Application pass rate",
+          value: "79%",
+          hint: "Agrochemical Inspection",
+          tone: "agrochemical",
+        },
+      ],
       sectionCharts: [
         {
+          id: "livestock",
+          title: "Livestock inspection",
+          description: "What is the compliance status of livestock & premises facilities?",
+          kpis: [
+            {
+              id: "livestock-compliance",
+              label: "Unit compliance rate",
+              value: "76%",
+              tone: "slaughterhouse",
+            },
+            {
+              id: "livestock-carrier",
+              label: "Meat carrier compliance rate",
+              value: "71%",
+              tone: "seed",
+            },
+            {
+              id: "livestock-feed",
+              label: "Feed sector compliance rate",
+              value: "74%",
+              tone: "agrochemical",
+            },
+            {
+              id: "livestock-honey",
+              label: "Honey value-chain compliance rate",
+              value: "81%",
+              tone: "seed-producer",
+            },
+            {
+              id: "livestock-dairy",
+              label: "Dairy compliance rate",
+              value: "78%",
+              tone: "slaughterhouse",
+            },
+          ],
+        },
+        {
+          id: "livestock-size",
+          title: "Compliance by facility size",
+          description: "Slaughterhouse — Small / Medium / Large",
+          bars: [
+            { name: "Small", value: 72 },
+            { name: "Medium", value: 81 },
+            { name: "Large", value: 88 },
+          ],
+        },
+        {
+          id: "livestock-decisions",
+          title: "Livestock decisions",
+          description: "Quick registration / Continue & correct / Temporary closure / Closure & relocation",
+          donut: [
+            { name: "Quick registration", value: 54 },
+            { name: "Continue & correct", value: 38 },
+            { name: "Temporary closure", value: 12 },
+            { name: "Closure & relocation", value: 7 },
+          ],
+        },
+        {
+          id: "livestock-registration",
+          title: "Registration status distribution",
+          description: "Registered / Pending / Informal",
+          donut: [
+            { name: "Registered", value: 62 },
+            { name: "Pending", value: 28 },
+            { name: "Informal", value: 14 },
+          ],
+        },
+        {
+          id: "livestock-geo",
+          title: "Distribution by province",
+          description: "Distribution by Province/District",
+          bars: [
+            { name: "Kigali", value: 38 },
+            { name: "Northern", value: 22 },
+            { name: "Southern", value: 26 },
+            { name: "Eastern", value: 19 },
+            { name: "Western", value: 16 },
+          ],
+        },
+        {
+          id: "livestock-value-chain",
+          title: "Compliance rate by value chain",
+          description: "Meat / Feed / Honey / Dairy",
+          bars: [
+            { name: "Meat", value: 76 },
+            { name: "Feed", value: 74 },
+            { name: "Honey", value: 81 },
+            { name: "Dairy", value: 78 },
+          ],
+        },
+        {
+          id: "plant-warehouse",
+          title: "Export consignment decisions",
+          description: "How are export/warehouse consignments performing?",
+          kpis: [
+            {
+              id: "consignments",
+              label: "Consignments reviewed",
+              value: "186",
+              tone: "seed-producer",
+            },
+          ],
+          bars: [
+            { name: "Confirmed / Accepted All", value: 98 },
+            { name: "Laboratory Diagnosis", value: 42 },
+            { name: "Only [X] kgs Accepted", value: 28 },
+            { name: "Rejected All", value: 18 },
+          ],
+        },
+        {
+          id: "plant-warehouse-pests",
+          title: "Pest / disease interceptions",
+          description: "Interceptions by pest name",
+          bars: [
+            { name: "Fruit fly", value: 14 },
+            { name: "False codling moth", value: 9 },
+            { name: "Thrips", value: 7 },
+            { name: "Bacterial wilt", value: 5 },
+          ],
+        },
+        {
+          id: "plant-warehouse-commodity",
+          title: "Rejection rate by commodity",
+          description: "Share of consignments rejected",
+          bars: [
+            { name: "Coffee", value: 8 },
+            { name: "Tea", value: 6 },
+            { name: "Chili", value: 14 },
+            { name: "Cut flowers", value: 11 },
+            { name: "Fresh fruit", value: 9 },
+          ],
+        },
+        {
+          id: "plant-warehouse-destination",
+          title: "Distribution by country of final destination",
+          description: "Consignments reviewed",
+          bars: [
+            { name: "UAE", value: 42 },
+            { name: "Netherlands", value: 36 },
+            { name: "UK", value: 28 },
+            { name: "Belgium", value: 22 },
+            { name: "Kenya", value: 18 },
+          ],
+        },
+        {
           id: "seed",
-          title: "Seed Inspection & Certification",
-          description: "How is the seed certification process performing?",
+          title: "Field inspection decisions",
+          description: "How is the seed certification and verification process performing?",
           kpis: [
             {
               id: "apps",
@@ -340,7 +526,7 @@ export const directorDashboards: Record<BusinessUnitKey, DirectorUnitDashboard> 
             },
             {
               id: "lab-time",
-              label: "Avg. time, collection to lab reception",
+              label: "Average time, collection to lab reception",
               value: "4.2 days",
               tone: "seed",
             },
@@ -352,90 +538,9 @@ export const directorDashboards: Record<BusinessUnitKey, DirectorUnitDashboard> 
           ],
         },
         {
-          id: "slaughterhouse",
-          title: "Slaughterhouse Inspection",
-          description: "What is the compliance status of slaughterhouses?",
-          kpis: [
-            {
-              id: "compliance",
-              label: "Unit compliance rate",
-              value: "76%",
-              tone: "slaughterhouse",
-            },
-            {
-              id: "carrier",
-              label: "Meat carrier compliance rate",
-              value: "71%",
-              tone: "seed",
-            },
-          ],
-          bars: [
-            { name: "Small", value: 72 },
-            { name: "Medium", value: 81 },
-            { name: "Large", value: 88 },
-          ],
-          donut: [
-            { name: "Quick registration", value: 54 },
-            { name: "Continue & correct", value: 38 },
-            { name: "Temporary closure", value: 12 },
-            { name: "Closure & relocation", value: 7 },
-          ],
-        },
-        {
-          id: "slaughterhouse-registration",
-          title: "Slaughterhouse registration status",
-          description: "Registration Status Distribution",
-          donut: [
-            { name: "Registered", value: 62 },
-            { name: "Pending", value: 28 },
-            { name: "Informal", value: 14 },
-          ],
-        },
-        {
-          id: "slaughterhouse-geo",
-          title: "Slaughterhouse distribution",
-          description: "Distribution by Province/District",
-          bars: [
-            { name: "Kigali", value: 38 },
-            { name: "Northern", value: 22 },
-            { name: "Southern", value: 26 },
-            { name: "Eastern", value: 19 },
-            { name: "Western", value: 16 },
-          ],
-        },
-        {
-          id: "agrochemical",
-          title: "Agrochemical Dealership Licensing",
-          description: "How are licensing applications performing?",
-          kpis: [
-            {
-              id: "agrochemical-pass",
-              label: "Application pass rate",
-              value: "79%",
-              tone: "agrochemical",
-            },
-          ],
-          bars: [
-            { name: "Retail", value: 82 },
-            { name: "Wholesale", value: 76 },
-            { name: "Importer", value: 71 },
-          ],
-        },
-        {
-          id: "agrochemical-product",
-          title: "Agrochemical pass rate by product category",
-          description: "Pass Rate by Product Category",
-          bars: [
-            { name: "Pesticides", value: 81 },
-            { name: "Fertilizers", value: 77 },
-            { name: "Seeds treatment", value: 74 },
-            { name: "Other", value: 69 },
-          ],
-        },
-        {
           id: "seed-producer",
-          title: "Seed Producer Onsite Verification",
-          description: "What is the status of onsite verification?",
+          title: "Producer onsite verification",
+          description: "Verification pass rate and land under verified production",
           kpis: [
             {
               id: "seed-producer-pass",
@@ -449,6 +554,13 @@ export const directorDashboards: Record<BusinessUnitKey, DirectorUnitDashboard> 
               value: "68%",
               tone: "seed",
             },
+            {
+              id: "sampling-volume",
+              label: "Sampling volume",
+              value: "156",
+              hint: "Samples collected",
+              tone: "agrochemical",
+            },
           ],
           bars: [
             { name: "Maize", value: 420 },
@@ -459,13 +571,63 @@ export const directorDashboards: Record<BusinessUnitKey, DirectorUnitDashboard> 
         },
         {
           id: "seed-producer-tenure",
-          title: "Seed producer pass rate by land tenure",
-          description: "Pass Rate by Land Tenure",
+          title: "Pass rate by land tenure",
+          description: "Producer verification",
           bars: [
             { name: "Owned", value: 78 },
             { name: "Leased", value: 71 },
             { name: "Communal", value: 66 },
             { name: "Other", value: 62 },
+          ],
+        },
+        {
+          id: "seed-potato",
+          title: "Potato seed store decisions",
+          description: "Approved / Downgraded / Rejected / Reinspection",
+          bars: [
+            { name: "Approved", value: 38 },
+            { name: "Downgraded", value: 14 },
+            { name: "Rejected", value: 8 },
+            { name: "Reinspection", value: 11 },
+          ],
+        },
+        {
+          id: "seed-sampling",
+          title: "Sample certification type",
+          description: "National vs ISTA",
+          bars: [
+            { name: "National", value: 112 },
+            { name: "ISTA", value: 44 },
+          ],
+        },
+        {
+          id: "agrochemical",
+          title: "Agrochemical Inspection",
+          description: "How are licensing applications performing?",
+          kpis: [
+            {
+              id: "agrochemical-pass",
+              label: "Application pass rate",
+              value: "79%",
+              tone: "agrochemical",
+            },
+          ],
+          bars: [
+            { name: "Retail", value: 82 },
+            { name: "Wholesale", value: 76 },
+            { name: "Importer", value: 71 },
+            { name: "Distributor", value: 74 },
+          ],
+        },
+        {
+          id: "agrochemical-product",
+          title: "Pass rate by product category",
+          description: "Agrochemical dealership licensing",
+          bars: [
+            { name: "Pesticides", value: 81 },
+            { name: "Fertilizers", value: 77 },
+            { name: "Seeds treatment", value: 74 },
+            { name: "Other", value: 69 },
           ],
         },
       ],

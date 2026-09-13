@@ -21,10 +21,10 @@ const categoryAliases: Record<string, string[]> = {
 };
 
 const streamAliases: Record<string, string[]> = {
+  livestock: ["livestock"],
+  "plant-warehouse": ["plant and warehouse", "plant"],
   seed: ["seed"],
-  slaughterhouse: ["slaughterhouse"],
   agrochemical: ["agrochemical"],
-  "seed-producer": ["seed producer"],
 };
 
 const businessCategoryAliases: Record<string, string[]> = {
