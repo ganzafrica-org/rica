@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ChartCard } from "@/components/shared/chart-card";
 import type { NamedValue } from "@/data/director/dashboard";
+import { scaleNamedValues } from "@/lib/chart-period";
 import {
   matchProvinceKey,
   rwandaProvinces,
@@ -26,23 +27,21 @@ export function ProvinceMapCard({
 }: ProvinceMapCardProps) {
   const [active, setActive] = useState<ProvinceKey | null>(null);
 
-  const valueByKey = useMemo(() => {
-    const map = new Map<ProvinceKey, number>();
-    for (const item of data) {
-      const key = matchProvinceKey(item.name);
-      if (key) map.set(key, item.value);
-    }
-    return map;
-  }, [data]);
-
-  const max = Math.max(...Array.from(valueByKey.values()), 1);
-  const activeProvince = rwandaProvinces.find(
-    (province) => province.key === active,
-  );
-  const activeValue = active ? (valueByKey.get(active) ?? 0) : null;
-
   return (
     <ChartCard title={title} caption={description}>
+      {(period) => {
+        const scaled = scaleNamedValues(data, period);
+        const valueByKey = new Map<ProvinceKey, number>();
+        for (const item of scaled) {
+          const key = matchProvinceKey(item.name);
+          if (key) valueByKey.set(key, item.value);
+        }
+        const max = Math.max(...Array.from(valueByKey.values()), 1);
+        const activeProvince = rwandaProvinces.find(
+          (province) => province.key === active,
+        );
+        const activeValue = active ? (valueByKey.get(active) ?? 0) : null;
+        return (
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="relative mx-auto w-full max-w-[340px]">
           <svg
@@ -134,6 +133,8 @@ export function ProvinceMapCard({
           </ul>
         </div>
       </div>
+        );
+      }}
     </ChartCard>
   );
 }

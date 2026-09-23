@@ -18,6 +18,7 @@ import {
   type KpiItem,
 } from "@/data/director/dashboard";
 import { buildExecutiveDashboard } from "@/data/generators/executive-dashboard";
+import { iiuStackedDecisionSeries } from "@/data/iiu";
 import { getUnit } from "@/data/units";
 import type { UnitKey } from "@/types";
 import type { KpiCard } from "@/types/dashboard";
@@ -34,9 +35,9 @@ const unitSummaryChartIds: Record<UnitKey, readonly string[]> = {
   rlu: ["operators", "approval-by-cat", "geo-operators", "renewals"],
   imu: [
     "business",
-    "assessment",
-    "product-surveillance",
-    "decisions-by-product",
+    "market-overview",
+    "industry-overview",
+    "service-overview",
   ],
   iiu: [
     "doc-review",
@@ -198,9 +199,17 @@ export function UnitDetailDashboard({ unitId }: UnitDetailDashboardProps) {
               />
             )}
             <DirectorStackedBarChart
-              title={unitId === "iiu" ? "Outcomes by office" : "Outcomes by province"}
+              title={
+                unitId === "iiu"
+                  ? "Inspection decisions by entry office code"
+                  : "Outcomes by province"
+              }
               data={director.outcomesByProvince}
-              series={stackedOutcomeSeries}
+              series={
+                unitId === "iiu"
+                  ? iiuStackedDecisionSeries
+                  : stackedOutcomeSeries
+              }
             />
           </div>
         ) : (

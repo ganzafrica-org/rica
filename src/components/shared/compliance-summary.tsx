@@ -20,6 +20,7 @@ type ComplianceSummaryProps = {
   lowestScore?: number;
   highestScore?: number;
   scoredCount?: number;
+  outcomesTitle?: string;
 };
 
 export function ComplianceSummary({
@@ -28,6 +29,7 @@ export function ComplianceSummary({
   lowestScore,
   highestScore,
   scoredCount,
+  outcomesTitle = "Inspection Outcomes",
 }: ComplianceSummaryProps) {
   const showScoreRange =
     lowestScore != null && highestScore != null && scoredCount != null;
@@ -65,7 +67,7 @@ export function ComplianceSummary({
       </SurfaceCard>
 
       {showScoreRange ? null : (
-      <ChartCard title="Inspection Outcomes" showPeriodSelect={false}>
+      <ChartCard title={outcomesTitle} showPeriodSelect={false}>
 
         <div className="h-52 w-full">
           <ResponsiveContainer width="100%" height="100%">

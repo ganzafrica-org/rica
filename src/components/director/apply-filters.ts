@@ -11,6 +11,7 @@ import type {
   NamedValue,
   StackedRow,
 } from "@/data/director/dashboard";
+import { iiuDecisionAliases, iiuOfficeAliases } from "@/data/iiu";
 
 const categoryAliases: Record<string, string[]> = {
   "seed-producers": ["seed producers", "seed producer"],
@@ -53,10 +54,7 @@ const generalCommodityAliases: Record<string, string[]> = {
   other: ["other"],
 };
 
-const officeAliases: Record<string, string[]> = {
-  gatuna: ["gatuna"],
-  "airport-cargo": ["airport cargo", "airport"],
-};
+const officeAliases: Record<string, string[]> = iiuOfficeAliases;
 
 const provinceAliases: Record<string, string[]> = {
   kigali: ["kigali", "kigali city"],
@@ -131,6 +129,14 @@ function scaleTrend(
 function inspectionScale(inspection: string) {
   if (inspection === "all") return 1;
   return 0.28;
+}
+
+function iiuRecordScale(hsCode: string, tinNumber: string, country: string) {
+  let scale = 1;
+  if (hsCode !== "all") scale *= 0.22;
+  if (tinNumber !== "all") scale *= 0.18;
+  if (country !== "all") scale *= 0.35;
+  return scale;
 }
 
 function categoryScale(category: string) {
@@ -209,12 +215,20 @@ export function applyDirectorFilters(
     data.filterMode === "categories"
       ? categoryScale(filters.category)
       : data.filterMode === "iiu"
-        ? inspectionScale(filters.inspectionName)
+        ? inspectionScale(filters.inspectionName) *
+          iiuRecordScale(filters.hsCode, filters.tinNumber, filters.country)
         : 1;
 
   let outcomes = data.outcomes;
   if (data.filterMode === "categories" && filters.category !== "all") {
     outcomes = deriveCategoryOutcomes(data, filters.category);
+  }
+  if (data.filterMode === "iiu" && filters.inspectionName !== "all") {
+    outcomes = filterNamed(
+      data.outcomes,
+      filters.inspectionName,
+      iiuDecisionAliases,
+    ) ?? data.outcomes;
   }
 
   let outcomesByProvince = filterStacked(
@@ -288,7 +302,8 @@ export function applyDirectorFilters(
         }
         if (
           section.id === "product-surveillance" ||
-          section.id === "decisions-by-product"
+          section.id === "decisions-by-product" ||
+          section.id === "industry-products"
         ) {
           bars = filterNamed(
             bars,
@@ -300,6 +315,38 @@ export function applyDirectorFilters(
             filters.productCategory,
             productCategoryAliases,
           );
+        }
+        if (
+          section.id === "service-overview" ||
+          section.id === "service-compliance" ||
+          section.id === "service-yoy"
+        ) {
+          bars = filterNamed(bars, filters.imuServiceCategory, {
+            garage: ["garage"],
+            "car-wash": ["car wash"],
+            welding: ["welding"],
+            salon: ["salon"],
+            pharmacy: ["pharmacy"],
+            other: ["other"],
+          });
+          stacked = filterStacked(stacked, filters.imuServiceCategory, {
+            garage: ["garage"],
+            "car-wash": ["car wash"],
+            welding: ["welding"],
+            salon: ["salon"],
+            pharmacy: ["pharmacy"],
+            other: ["other"],
+          });
+        }
+        if (filters.tinNumber !== "all") {
+          const tinScale = 0.2;
+          bars = bars?.map((row) => ({
+            ...row,
+            value: Math.max(1, Math.round(row.value * tinScale)),
+          }));
+          stacked = stacked
+            ? scaleStackedProvince(stacked, tinScale)
+            : stacked;
         }
       }
 

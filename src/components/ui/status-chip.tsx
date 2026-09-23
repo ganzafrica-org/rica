@@ -9,6 +9,11 @@ const statusMap = {
   approved: { color: "success" as const, label: "Approved" },
   rejected: { color: "danger" as const, label: "Rejected" },
   pending: { color: "warning" as const, label: "Pending" },
+  "pending-inspection": {
+    color: "warning" as const,
+    label: "Pending for inspection",
+  },
+  incomplete: { color: "default" as const, label: "Incomplete" },
 };
 
 export type StatusKey = keyof typeof statusMap;

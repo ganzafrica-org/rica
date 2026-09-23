@@ -7,6 +7,11 @@ import {
   weekLabels,
   weekdayLabels,
 } from "@/data/reference";
+import {
+  iiuDecisionColors,
+  iiuHsCodes,
+  iiuInspectionDecisions,
+} from "@/data/iiu";
 import { getService, unitContent, unitDefinitions } from "@/data/units";
 import type {
   ActivityChartSpec,
@@ -36,6 +41,13 @@ const registrationStatuses: StatusKey[] = [
   "approved",
   "pending",
   "not-started",
+];
+
+const inspectionStatuses: StatusKey[] = [
+  "pending",
+  "completed",
+  "not-started",
+  "ongoing",
 ];
 
 const pendingStatuses: StatusKey[] = ["pending", "not-started", "ongoing"];
@@ -286,7 +298,10 @@ export function buildInspectorDashboard(args: {
       id: "assigned",
       label: "Total Assigned Inspections",
       value: String(assigned),
-      hint: `${definition.shortLabel} · current period`,
+      hint:
+        unit === "imu"
+          ? "Q3 2026 · business outlets, industries, and service provisions"
+          : `${definition.shortLabel} · current period`,
       tone: accent,
     },
     {
@@ -308,6 +323,8 @@ export function buildInspectorDashboard(args: {
     },
   ];
 
+  const iiuHsLabels = iiuHsCodes.map((code) => code.label);
+
   // Assigned facilities
   const facilityCount = rngInt(rng, 6, 9);
   const facilities: AssignedFacility[] = Array.from(
@@ -321,28 +338,41 @@ export function buildInspectorDashboard(args: {
         ? rngPick(facilityRng, spec.facilitySuffixes)
         : "Facility";
 
+      const isIiu = unit === "iiu";
       return {
         id: `facility-${index}`,
-        name: `${prefix} ${suffix}`,
+        name: isIiu ? prefix : `${prefix} ${suffix}`.trim(),
         classification: spec
           ? rngPick(facilityRng, spec.classifications)
           : "General",
-        district: rngPick(facilityRng, districts),
-        registrationStatus: rngPick(facilityRng, registrationStatuses),
+        district: isIiu
+          ? rngPick(facilityRng, iiuHsLabels)
+          : rngPick(facilityRng, districts),
+        registrationStatus: rngPick(
+          facilityRng,
+          isIiu ? inspectionStatuses : registrationStatuses,
+        ),
       };
     },
   );
 
-  // Compliance
+  // Compliance — IIU uses inspection decisions, not registration outcomes.
   const averageScore = rngInt(rng, 68, 94);
   const lowestScore = rngInt(rng, 42, Math.min(67, averageScore - 4));
   const highestScore = rngInt(rng, Math.max(averageScore + 2, 88), 98);
   const scoredCount = Math.max(1, completed);
-  const outcomeTotals = rngSplit(rng, completed, complianceOutcomeLabels.length);
-  const outcomes = complianceOutcomeLabels.map((outcome, index) => ({
+  const iiuOutcomeLabels = iiuInspectionDecisions.map(
+    (decision) => decision.label,
+  );
+  const outcomeLabels =
+    unit === "iiu" ? iiuOutcomeLabels : complianceOutcomeLabels;
+  const outcomeColors =
+    unit === "iiu" ? iiuDecisionColors : complianceOutcomeColors;
+  const outcomeTotals = rngSplit(rng, completed, outcomeLabels.length);
+  const outcomes = outcomeLabels.map((outcome, index) => ({
     outcome,
     count: outcomeTotals[index]!,
-    color: complianceOutcomeColors[index]!,
+    color: outcomeColors[index]!,
   }));
 
   if (unit === "fpu") {

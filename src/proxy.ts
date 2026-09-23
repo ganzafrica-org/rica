@@ -43,7 +43,9 @@ export function proxy(request: NextRequest) {
   }
 
   const pathRole = getRoleFromPath(pathname);
-  if (pathRole && pathRole !== user.role) {
+  const seniorInspectorOnDirector =
+    user.role === "senior-inspector" && pathRole === "director";
+  if (pathRole && pathRole !== user.role && !seniorInspectorOnDirector) {
     return NextResponse.redirect(new URL(roleHomePath[user.role], request.url));
   }
 

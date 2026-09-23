@@ -16,7 +16,7 @@ import type { ComplianceByServicePoint } from "@/types/dashboard";
 const unitCodeLabels: Record<string, string> = {
   FPU: "Farm Products",
   RLU: "Registration & Licensing",
-  IMU: "Market Surveillance",
+  IMU: "Industrial products & market surveillance",
   IIU: "Import Inspection",
 };
 

@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { DirectorStreamsView } from "@/components/director";
 import {
+  imuBusinessCategoryLabels,
+  isImuBusinessCategoryId,
+} from "@/data/imu";
+import {
   directorCategoryLabels,
   directorProductCategoryLabels,
   directorProductsByCategory,
@@ -27,6 +31,12 @@ export async function generateMetadata({
   }
   if (user?.unit === "iiu" && isDirectorProductCategoryId(stream)) {
     return { title: directorProductCategoryLabels[stream] };
+  }
+  if (
+    (user?.unit === "imu" || user?.role === "senior-inspector") &&
+    isImuBusinessCategoryId(stream)
+  ) {
+    return { title: imuBusinessCategoryLabels[stream] };
   }
   if (isDirectorStreamId(stream)) {
     return { title: directorStreamLabels[stream] };
@@ -65,6 +75,11 @@ export default async function DirectorDeepDivePage({ params }: PageProps) {
       return <DirectorStreamsView productCategoryId={stream} />;
     }
     redirect(`/director/streams/${stream}/${products[0].id}`);
+  }
+
+  if (user?.unit === "imu" || user?.role === "senior-inspector") {
+    if (!isImuBusinessCategoryId(stream)) notFound();
+    return <DirectorStreamsView imuCategoryId={stream} />;
   }
 
   // FPU regulatory streams (sidebar dropdown)

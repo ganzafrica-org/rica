@@ -67,9 +67,11 @@ function itemOrDescendantActive(
 }
 
 function flattenNavLeaves(items: NavItem[]): NavItem[] {
-  return items.flatMap((item) =>
-    item.children?.length ? flattenNavLeaves(item.children) : [item],
-  );
+  return items.flatMap((item) => {
+    if (!item.children?.length) return [item];
+    const leaves = flattenNavLeaves(item.children);
+    return item.linkParent ? [item, ...leaves] : leaves;
+  });
 }
 
 function NavLink({
@@ -157,7 +159,7 @@ function NavGroup({
   const Icon = iconMap[item.icon ?? "layers"] ?? Layers;
 
   const nestedGroups = children.filter((child) => child.children?.length);
-  const expandOnly = nestedGroups.length === 0;
+  const expandOnly = nestedGroups.length === 0 && !item.linkParent;
   const activeNestedHref =
     nestedGroups.find((child) =>
       itemOrDescendantActive(child, pathname, homeHref),

@@ -1,4 +1,9 @@
-import type { BusinessUnitKey, NavItem, UserRole } from "@/types";
+import type {
+  BusinessUnitKey,
+  ImuBusinessCategoryId,
+  NavItem,
+  UserRole,
+} from "@/types";
 
 /**
  * Director sidebar — only pages that map to Director KPI framework sections:
@@ -177,7 +182,67 @@ export const directorNavByUnit: Record<BusinessUnitKey, NavItem[]> = {
   imu: [
     { href: "/director", label: "Dashboard", icon: "dashboard" },
     { href: "/director/team", label: "Team", icon: "users" },
-    { href: "/director/streams", label: "Surveillance", icon: "layers" },
+    {
+      href: "/director/streams",
+      label: "Business categories",
+      icon: "layers",
+      children: [
+        {
+          href: "/director/streams/industries",
+          label: "Industries/SMEs",
+          shortLabel: "Industries",
+          icon: "building",
+          children: [
+            {
+              href: "/director/streams/industries",
+              label: "Overview",
+              icon: "dashboard",
+            },
+            {
+              href: "/director/streams/industries/assigned",
+              label: "Assigned list",
+              icon: "producer",
+            },
+          ],
+        },
+        {
+          href: "/director/streams/market",
+          label: "Market surveillance",
+          shortLabel: "Market",
+          icon: "facilities",
+          children: [
+            {
+              href: "/director/streams/market",
+              label: "Overview",
+              icon: "dashboard",
+            },
+            {
+              href: "/director/streams/market/assigned",
+              label: "Assigned list",
+              icon: "producer",
+            },
+          ],
+        },
+        {
+          href: "/director/streams/service",
+          label: "Service provisions",
+          shortLabel: "Services",
+          icon: "activity",
+          children: [
+            {
+              href: "/director/streams/service",
+              label: "Overview",
+              icon: "dashboard",
+            },
+            {
+              href: "/director/streams/service/assigned",
+              label: "Assigned list",
+              icon: "producer",
+            },
+          ],
+        },
+      ],
+    },
   ],
   iiu: [
     { href: "/director", label: "Dashboard", icon: "dashboard" },
@@ -531,6 +596,18 @@ export const inspectorNav: NavItem[] = [
 ];
 
 export function getInspectorNav(unit?: BusinessUnitKey): NavItem[] {
+  if (unit === "iiu" || unit === "imu") {
+    return inspectorNav.map((item) =>
+      item.href === "/inspector/facilities"
+        ? {
+            ...item,
+            label: "Assigned Inspections",
+            shortLabel: "Inspections",
+          }
+        : item,
+    );
+  }
+
   if (unit !== "fpu") return inspectorNav;
 
   return [
@@ -566,7 +643,7 @@ export const seniorDirectorNav: NavItem[] = [
       },
       {
         href: "/senior-director/units/imu",
-        label: "Market Surveillance",
+        label: "Industrial products & market surveillance",
         shortLabel: "IMU",
         icon: "building",
       },
@@ -584,6 +661,7 @@ export const seniorDirectorNav: NavItem[] = [
 
 export const navByRole: Record<UserRole, NavItem[]> = {
   inspector: inspectorNav,
+  "senior-inspector": directorNav,
   director: directorNav,
   "senior-director": seniorDirectorNav,
 };
@@ -592,11 +670,33 @@ export function getDirectorNav(unit?: BusinessUnitKey): NavItem[] {
   return directorNavByUnit[unit ?? "fpu"];
 }
 
+export function getSeniorInspectorNav(
+  specialty?: ImuBusinessCategoryId,
+): NavItem[] {
+  const category = specialty ?? "market";
+  return [
+    {
+      href: `/director/streams/${category}`,
+      label: "Overview",
+      icon: "dashboard",
+    },
+    {
+      href: `/director/streams/${category}/assigned`,
+      label: "Assigned list",
+      icon: "producer",
+    },
+  ];
+}
+
 export function getNavForUser(user: {
   role: UserRole;
   unit?: BusinessUnitKey;
+  imuSpecialty?: ImuBusinessCategoryId;
 }): NavItem[] {
   if (user.role === "inspector") return getInspectorNav(user.unit);
+  if (user.role === "senior-inspector") {
+    return getSeniorInspectorNav(user.imuSpecialty);
+  }
   if (user.role === "senior-director") return seniorDirectorNav;
   return getDirectorNav(user.unit);
 }
@@ -616,9 +716,9 @@ export const streamPageCopy: Record<
       "Licensing overview and category performance (§2.2).",
   },
   imu: {
-    title: "Surveillance",
+    title: "Business categories",
     description:
-      "Product surveillance, decisions, and cross-cutting compliance (§3.2).",
+      "Industries/SMEs, market surveillance, and service provisions.",
   },
   iiu: {
     title: "Product categories",

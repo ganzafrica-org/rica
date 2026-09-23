@@ -20,6 +20,12 @@ export default async function DirectorStreamsIndexPage() {
   if (user.unit === "iiu") {
     redirect("/director/streams/food/rice");
   }
+  if (user.unit === "imu") {
+    if (user.role === "senior-inspector") {
+      redirect(`/director/streams/${user.imuSpecialty ?? "market"}`);
+    }
+    redirect("/director/streams/industries");
+  }
 
   return <DirectorStreamsView />;
 }

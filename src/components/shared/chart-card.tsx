@@ -1,13 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { Label, ListBox, Select } from "@/components/ui";
 import { SurfaceCard } from "@/components/ui/surface-card";
-
-const chartPeriodOptions = [
-  { id: "2021-2025", label: "2021-2025" },
-  { id: "2024-2028", label: "2024-2028" },
-  { id: "2020-2024", label: "2020-2024" },
-] as const;
+import {
+  chartPeriodOptions,
+  defaultChartPeriod,
+  isChartPeriodId,
+  type ChartPeriodId,
+} from "@/lib/chart-period";
 
 type ChartCardProps = {
   title: string;
@@ -19,7 +20,7 @@ type ChartCardProps = {
   actions?: React.ReactNode;
   /** Set false for charts whose x-axis is not a reporting period. */
   showPeriodSelect?: boolean;
-  children: React.ReactNode;
+  children: React.ReactNode | ((period: ChartPeriodId) => React.ReactNode);
 };
 
 export function ChartCard({
@@ -31,11 +32,18 @@ export function ChartCard({
   showPeriodSelect = true,
   children,
 }: ChartCardProps) {
+  const [period, setPeriod] = useState<ChartPeriodId>(defaultChartPeriod);
+
   const periodSelect = (
     <Select
       className="w-[132px]"
-      defaultSelectedKey="2021-2025"
+      selectedKey={period}
       aria-label="Chart period"
+      onSelectionChange={(key) => {
+        if (key == null) return;
+        const next = String(key);
+        if (isChartPeriodId(next)) setPeriod(next);
+      }}
     >
       <Label className="sr-only">Period</Label>
       <Select.Trigger>
@@ -63,7 +71,7 @@ export function ChartCard({
       actions={actions ?? (showPeriodSelect ? periodSelect : null)}
     >
       <div className="flex min-h-0 flex-1 flex-col space-y-1">
-        {children}
+        {typeof children === "function" ? children(period) : children}
         {caption ? <p className="rica-caption text-right">{caption}</p> : null}
       </div>
     </SurfaceCard>

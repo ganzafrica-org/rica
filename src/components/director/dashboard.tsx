@@ -17,11 +17,13 @@ import {
   DirectorStackedBarChart,
 } from "@/components/director/charts";
 import { DirectorKpiGrid } from "@/components/director/kpi-grid";
+import { DirectorWorkloadTables } from "@/components/director/workload-tables";
 import { SurfaceCard } from "@/components/ui/surface-card";
 import {
   directorDashboards,
   stackedOutcomeSeries,
 } from "@/data/director/dashboard";
+import { iiuStackedDecisionSeries } from "@/data/iiu";
 import { businessUnits } from "@/data/units";
 
 /** Decision charts on the FPU unit dashboard — not the full subunit catalogue. */
@@ -32,7 +34,7 @@ const fpuDashboardChartIds = [
 ] as const;
 
 /** Unit-wide IMU bar charts on the dashboard (§3.2). */
-const imuDashboardChartIds = new Set(["business", "assessment"]);
+const imuDashboardChartIds = new Set(["business"]);
 
 /** Unit-wide IIU charts on the dashboard (§4.2). */
 const iiuDashboardChartIds = new Set([
@@ -75,14 +77,7 @@ export function DirectorDashboard() {
   );
 
   const imuSummaryKpis =
-    unitKey === "imu"
-      ? [
-          ...filtered.sectionOverviewKpis,
-          ...(filtered.sectionCharts.find(
-            (section) => section.id === "product-surveillance",
-          )?.kpis ?? []),
-        ]
-      : [];
+    unitKey === "imu" ? filtered.sectionOverviewKpis : [];
 
   const iiuSummaryKpis =
     unitKey === "iiu" ? filtered.sectionOverviewKpis : [];
@@ -179,9 +174,9 @@ export function DirectorDashboard() {
             colorOffset={0}
           />
           <DirectorStackedBarChart
-            title="Outcomes by office"
+            title="Inspection decisions by entry office code"
             data={filtered.outcomesByProvince}
-            series={stackedOutcomeSeries}
+            series={iiuStackedDecisionSeries}
           />
           <DirectorLineChart
             title={trendTitle}
@@ -202,6 +197,8 @@ export function DirectorDashboard() {
             renderSectionChart(section, index + 2),
           )}
         </div>
+
+        <DirectorWorkloadTables unit="iiu" />
       </PageTransition>
     );
   }
@@ -245,14 +242,6 @@ export function DirectorDashboard() {
         </div>
       ) : null}
 
-      {imuSummaryCharts.length > 0 ? (
-        <div className="grid gap-6 lg:grid-cols-2">
-          {imuSummaryCharts.map((section, index) =>
-            renderSectionChart(section, index),
-          )}
-        </div>
-      ) : null}
-
       {fpuHeadlineKpis.length > 0 ? (
         <DirectorKpiGrid items={fpuHeadlineKpis} />
       ) : null}
@@ -281,6 +270,11 @@ export function DirectorDashboard() {
       ) : data.showOutcomes ? (
         <section className="space-y-4">
           <div className="grid gap-6 lg:grid-cols-2">
+            {unitKey === "imu"
+              ? imuSummaryCharts.map((section, index) =>
+                  renderSectionChart(section, index),
+                )
+              : null}
             {data.outcomesChart === "donut" ? (
               <DirectorDonutChart
                 title="Unit-wide outcome mix"
@@ -293,11 +287,13 @@ export function DirectorDashboard() {
                 colorOffset={0}
               />
             )}
-            <DirectorStackedBarChart
-              title="Outcomes by province"
-              data={filtered.outcomesByProvince}
-              series={stackedOutcomeSeries}
-            />
+            {unitKey === "imu" ? null : (
+              <DirectorStackedBarChart
+                title="Outcomes by province"
+                data={filtered.outcomesByProvince}
+                series={stackedOutcomeSeries}
+              />
+            )}
           </div>
           {filtered.outcomesByStream ? (
             <div className="grid gap-6 lg:grid-cols-2">

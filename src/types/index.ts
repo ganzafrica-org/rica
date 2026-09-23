@@ -1,4 +1,10 @@
-export type UserRole = "inspector" | "director" | "senior-director";
+export type UserRole =
+  | "inspector"
+  | "senior-inspector"
+  | "director"
+  | "senior-director";
+
+export type ImuBusinessCategoryId = "industries" | "market" | "service";
 
 /** The four RICA organisational units. */
 export type BusinessUnitKey = "fpu" | "rlu" | "imu" | "iiu";
@@ -40,6 +46,8 @@ export type AuthUser = {
   unit: BusinessUnitKey;
   /** Seeds the default service filter. A preference, not an access restriction. */
   homeService?: ServiceKey;
+  /** IMU senior inspectors are scoped to one business category. */
+  imuSpecialty?: ImuBusinessCategoryId;
   /** Alternate sign-in addresses that resolve to this account. */
   aliases?: string[];
 };
@@ -68,6 +76,8 @@ export type NavItem = {
   icon?: NavIcon;
   /** Nested sidebar items (dropdown group). */
   children?: NavItem[];
+  /** Parent stays a link while its children expand as a dropdown. */
+  linkParent?: boolean;
 };
 
 export type ServiceDefinition = {

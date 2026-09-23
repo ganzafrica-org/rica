@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DirectorStreamsView } from "@/components/director";
+import {
+  DirectorAssignmentList,
+  DirectorStreamsView,
+} from "@/components/director";
+import {
+  imuAssignedListLabels,
+  isImuBusinessCategoryId,
+} from "@/data/imu";
 import {
   directorProductCategoryLabels,
   directorProductLabel,
@@ -34,6 +41,14 @@ export async function generateMetadata({
     };
   }
 
+  if (
+    (user?.unit === "imu" || user?.role === "senior-inspector") &&
+    product === "assigned" &&
+    isImuBusinessCategoryId(stream)
+  ) {
+    return { title: imuAssignedListLabels[stream] };
+  }
+
   if (!isDirectorProductCategoryId(stream)) return { title: "Import operations" };
   const label = directorProductLabel(stream, product);
   return {
@@ -53,6 +68,14 @@ export default async function DirectorNestedStreamPage({ params }: PageProps) {
     return (
       <DirectorStreamsView streamId={stream} streamFacilityId={product} />
     );
+  }
+
+  if (
+    (user?.unit === "imu" || user?.role === "senior-inspector") &&
+    product === "assigned" &&
+    isImuBusinessCategoryId(stream)
+  ) {
+    return <DirectorAssignmentList imuCategory={stream} />;
   }
 
   if (user?.unit !== "iiu") notFound();
