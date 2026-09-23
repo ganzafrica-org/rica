@@ -24,6 +24,9 @@ export type DirectorFilterValues = {
   officeName: string;
   inspectionName: string;
   country: string;
+  hsCode: string;
+  tinNumber: string;
+  imuServiceCategory: string;
 };
 
 export const defaultDirectorFilterValues: DirectorFilterValues = {
@@ -39,6 +42,9 @@ export const defaultDirectorFilterValues: DirectorFilterValues = {
   officeName: "all",
   inspectionName: "all",
   country: "all",
+  hsCode: "all",
+  tinNumber: "all",
+  imuServiceCategory: "all",
 };
 
 type DirectorFiltersProps = {
@@ -46,12 +52,10 @@ type DirectorFiltersProps = {
   className?: string;
   values?: Partial<DirectorFilterValues>;
   onChange?: (key: keyof DirectorFilterValues, value: string) => void;
-  /** When product category is chosen in the sidebar (IIU). */
-  hideProductCategory?: boolean;
-  /** When product name is chosen in the sidebar (IIU). */
-  hideProductName?: boolean;
   /** General Category page — commodities without a product checklist. */
   showGeneralCommodity?: boolean;
+  /** IMU business-category pages. */
+  imuScope?: "industries" | "market" | "service";
 };
 
 function FilterSelect({
@@ -121,21 +125,17 @@ export function DirectorFilters({
   className,
   values,
   onChange,
-  hideProductCategory = false,
-  hideProductName = false,
   showGeneralCommodity = false,
+  imuScope,
 }: DirectorFiltersProps) {
   const current = { ...defaultDirectorFilterValues, ...values };
   const isIiu = filterMode === "iiu";
-  const showIiuCategoryFilters =
-    isIiu &&
-    (!hideProductCategory ||
-      showGeneralCommodity ||
-      (!hideProductName && !showGeneralCommodity));
+  const isImuScope = Boolean(imuScope);
   const hasUnitFilters =
     filterMode === "categories" ||
-    filterMode === "imu" ||
-    showIiuCategoryFilters;
+    (filterMode === "imu" && !isImuScope) ||
+    isImuScope ||
+    (isIiu && showGeneralCommodity);
 
   const provinces = useMemo(() => provinceFilterOptions(), []);
   const districts = useMemo(
@@ -159,19 +159,19 @@ export function DirectorFilters({
         {isIiu ? (
           <>
             <FilterSelect
-              label="Office name"
+              label="Entry office code"
               options={directorFilterOptions.officeNames}
               selectedKey={current.officeName}
               onSelectionChange={(value) => onChange?.("officeName", value)}
             />
             <FilterSelect
-              label="Inspection name"
+              label="Inspection decisions"
               options={directorFilterOptions.inspectionNames}
               selectedKey={current.inspectionName}
               onSelectionChange={(value) => onChange?.("inspectionName", value)}
             />
           </>
-        ) : (
+        ) : imuScope === "market" ? null : (
           <>
             {filterMode === "streams" ? (
               <FilterSelect
@@ -201,6 +201,29 @@ export function DirectorFilters({
         <FilterDateRange label="Date range" />
       </FilterBar>
 
+      {isIiu ? (
+        <FilterBar>
+          <FilterSelect
+            label="HS code"
+            options={directorFilterOptions.hsCodes}
+            selectedKey={current.hsCode}
+            onSelectionChange={(value) => onChange?.("hsCode", value)}
+          />
+          <FilterSelect
+            label="TIN number"
+            options={directorFilterOptions.tinNumbers}
+            selectedKey={current.tinNumber}
+            onSelectionChange={(value) => onChange?.("tinNumber", value)}
+          />
+          <FilterSelect
+            label="Country of origin"
+            options={directorFilterOptions.countries}
+            selectedKey={current.country}
+            onSelectionChange={(value) => onChange?.("country", value)}
+          />
+        </FilterBar>
+      ) : null}
+
       {hasUnitFilters ? (
         <FilterBar>
           {filterMode === "categories" ? (
@@ -211,7 +234,7 @@ export function DirectorFilters({
               onSelectionChange={(value) => onChange?.("category", value)}
             />
           ) : null}
-          {filterMode === "imu" ? (
+          {filterMode === "imu" && !imuScope ? (
             <>
               <FilterSelect
                 label="Business category"
@@ -237,39 +260,43 @@ export function DirectorFilters({
               />
             </>
           ) : null}
-          {filterMode === "iiu" ? (
-            <>
-              {!hideProductCategory ? (
-                <FilterSelect
-                  label="Product category"
-                  options={directorFilterOptions.iiuProductCategories}
-                  selectedKey={current.productCategory}
-                  onSelectionChange={(value) =>
-                    onChange?.("productCategory", value)
-                  }
-                />
-              ) : null}
-              {showGeneralCommodity ? (
-                <FilterSelect
-                  label="General category"
-                  options={directorFilterOptions.generalCommodities}
-                  selectedKey={current.generalCommodity}
-                  onSelectionChange={(value) =>
-                    onChange?.("generalCommodity", value)
-                  }
-                />
-              ) : null}
-              {!hideProductName && !showGeneralCommodity ? (
-                <FilterSelect
-                  label="Product name"
-                  options={directorFilterOptions.productNames}
-                  selectedKey={current.productName}
-                  onSelectionChange={(value) =>
-                    onChange?.("productName", value)
-                  }
-                />
-              ) : null}
-            </>
+          {isIiu && showGeneralCommodity ? (
+            <FilterSelect
+              label="General category"
+              options={directorFilterOptions.generalCommodities}
+              selectedKey={current.generalCommodity}
+              onSelectionChange={(value) =>
+                onChange?.("generalCommodity", value)
+              }
+            />
+          ) : null}
+          {imuScope === "service" ? (
+            <FilterSelect
+              label="Service category"
+              options={directorFilterOptions.imuServiceCategories}
+              selectedKey={current.imuServiceCategory}
+              onSelectionChange={(value) =>
+                onChange?.("imuServiceCategory", value)
+              }
+            />
+          ) : null}
+          {imuScope === "industries" || imuScope === "market" ? (
+            <FilterSelect
+              label="Product"
+              options={directorFilterOptions.imuProducts}
+              selectedKey={current.productCategory}
+              onSelectionChange={(value) =>
+                onChange?.("productCategory", value)
+              }
+            />
+          ) : null}
+          {imuScope ? (
+            <FilterSelect
+              label="TIN number"
+              options={directorFilterOptions.imuTinNumbers}
+              selectedKey={current.tinNumber}
+              onSelectionChange={(value) => onChange?.("tinNumber", value)}
+            />
           ) : null}
         </FilterBar>
       ) : null}

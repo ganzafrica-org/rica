@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "recharts";
 import { ChartCard } from "@/components/shared/chart-card";
+import { scaleNamedValues } from "@/lib/chart-period";
 import type { DonutSlice } from "@/types/dashboard";
 
 type DonutChartProps = {
@@ -29,8 +30,6 @@ export function DonutChart({
   centerLabel,
   showPeriodSelect = true,
 }: DonutChartProps) {
-  const total = slices.reduce((sum, slice) => sum + slice.value, 0);
-
   return (
     <ChartCard
       title={title}
@@ -38,11 +37,17 @@ export function DonutChart({
       caption={caption}
       showPeriodSelect={showPeriodSelect}
     >
+      {(period) => {
+        const series = showPeriodSelect
+          ? scaleNamedValues(slices, period)
+          : [...slices];
+        const total = series.reduce((sum, slice) => sum + slice.value, 0);
+        return (
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={[...slices]}
+              data={series}
               dataKey="value"
               nameKey="name"
               cx="50%"
@@ -53,7 +58,7 @@ export function DonutChart({
               stroke="none"
               isAnimationActive={false}
             >
-              {slices.map((slice) => (
+              {series.map((slice) => (
                 <Cell key={slice.name} fill={slice.color} />
               ))}
               {/* Rendered inside the SVG so it tracks the donut hole exactly. */}
@@ -113,6 +118,8 @@ export function DonutChart({
           </PieChart>
         </ResponsiveContainer>
       </div>
+        );
+      }}
     </ChartCard>
   );
 }

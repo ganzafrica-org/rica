@@ -15,11 +15,16 @@ import {
   chartColors,
   DirectorBarChart,
   DirectorDonutChart,
+  DirectorGroupedBarChart,
   DirectorLineChart,
   DirectorStackedBarChart,
 } from "@/components/director/charts";
 import { ProvinceMapCard } from "@/components/director/province-map-card";
 import { directorDashboards } from "@/data/director/dashboard";
+import {
+  imuBusinessCategoryLabels,
+  type ImuBusinessCategoryId,
+} from "@/data/imu";
 import {
   directorCategoryLabels,
   directorProductCategoryLabels,
@@ -43,6 +48,8 @@ type DirectorStreamsViewProps = {
   productNameId?: string;
   /** When set (FPU nested facility / checklist type). */
   streamFacilityId?: string;
+  /** When set (IMU sidebar), lock the view to this business category. */
+  imuCategoryId?: ImuBusinessCategoryId;
 };
 
 export function DirectorStreamsView({
@@ -51,6 +58,7 @@ export function DirectorStreamsView({
   productCategoryId,
   productNameId,
   streamFacilityId,
+  imuCategoryId,
 }: DirectorStreamsViewProps) {
   const { user } = useAuth();
   const unitKey = user?.unit ?? "fpu";
@@ -92,8 +100,33 @@ export function DirectorStreamsView({
   const dashboardOnlySectionIds = new Set([
     "operators",
     "approval-by-cat",
-    ...(unitKey === "imu" ? ["business", "assessment", "geo"] : []),
+    ...(unitKey === "imu" ? ["business", "geo"] : []),
   ]);
+  const imuCategoryChartIds: Record<ImuBusinessCategoryId, readonly string[]> = {
+    industries: [
+      "industry-overview",
+      "industry-products",
+      "industry-premise",
+      "industry-decisions",
+      "industry-compliance",
+      "industry-yoy",
+    ],
+    market: [
+      "market-overview",
+      "market-outcomes",
+      "assessment",
+      "product-surveillance",
+      "decisions-by-product",
+      "crosscut",
+    ],
+    service: [
+      "service-overview",
+      "service-compliance",
+      "service-decisions",
+      "service-compliance-trend",
+      "service-yoy",
+    ],
+  };
   const generalChartIds = new Set([
     "general-commodities",
     "general-decisions",
@@ -126,6 +159,9 @@ export function DirectorStreamsView({
         fpuStreamChartIds[streamId].includes(section.id)
       );
     }
+    if (unitKey === "imu" && imuCategoryId) {
+      return imuCategoryChartIds[imuCategoryId].includes(section.id);
+    }
     return !generalChartIds.has(section.id);
   });
   // Stream/licensing category chosen in sidebar — geo/date only.
@@ -138,7 +174,9 @@ export function DirectorStreamsView({
       ? "basic"
       : productCategoryId
         ? "iiu"
-        : data.filterMode;
+        : imuCategoryId
+          ? "imu"
+          : data.filterMode;
 
   const facilityLabel =
     streamId && streamFacilityId
@@ -155,7 +193,9 @@ export function DirectorStreamsView({
         ? `${directorProductLabel(productCategoryId, productNameId) ?? productNameId} overview`
         : productCategoryId
           ? `${directorProductCategoryLabels[productCategoryId]} overview`
-          : copy.title;
+          : imuCategoryId
+            ? imuBusinessCategoryLabels[imuCategoryId]
+            : copy.title;
 
   const charts = sections.flatMap((section, sectionIndex) => {
     const items: ReactNode[] = [];
@@ -195,8 +235,11 @@ export function DirectorStreamsView({
       );
     }
     if (section.stacked && section.stackedKeys) {
+      const Stacked = section.grouped
+        ? DirectorGroupedBarChart
+        : DirectorStackedBarChart;
       items.push(
-        <DirectorStackedBarChart
+        <Stacked
           key={`${section.id}-stacked`}
           title={section.title}
           data={section.stacked}
@@ -213,7 +256,8 @@ export function DirectorStreamsView({
     !isGeneralCategory &&
     filtered.mapProvinces &&
     filtered.mapProvinces.length > 0 &&
-    !streamId;
+    !streamId &&
+    !imuCategoryId;
 
   if (showMap) {
     charts.push(
@@ -247,6 +291,7 @@ export function DirectorStreamsView({
   const combinedKpis =
     !streamId &&
     !productCategoryId &&
+    !imuCategoryId &&
     (overviewKpis.length > 0 || sectionKpis.length > 0)
       ? [...overviewKpis, ...sectionKpis]
       : null;
@@ -265,20 +310,20 @@ export function DirectorStreamsView({
         filterMode={filterMode}
         values={activeFilters}
         onChange={onFilterChange}
-        hideProductCategory={Boolean(productCategoryId)}
-        hideProductName={Boolean(productNameId) || isGeneralCategory}
         showGeneralCommodity={isGeneralCategory}
+        imuScope={imuCategoryId}
       />
 
       {combinedKpis && combinedKpis.length > 0 ? (
         <DirectorKpiGrid items={combinedKpis} />
       ) : null}
 
-      {(streamId || productCategoryId) && kpiSections.length > 0 ? (
+      {(streamId || productCategoryId || imuCategoryId) &&
+      kpiSections.length > 0 ? (
         <DirectorKpiGrid
           items={kpiSections
             .flatMap((section) => section.kpis ?? [])
-            .slice(0, 5)}
+            .slice(0, imuCategoryId ? 8 : 5)}
         />
       ) : null}
 

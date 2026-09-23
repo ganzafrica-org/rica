@@ -33,8 +33,8 @@ export const businessUnits: Record<BusinessUnitKey, BusinessUnit> = {
   },
   imu: {
     key: "imu",
-    name: "Industries & Market Surveillance Unit",
-    shortName: "Market Surveillance",
+    name: "Industrial products and market surveillance unit",
+    shortName: "Industrial products & market surveillance",
     code: "IMU",
   },
   iiu: {

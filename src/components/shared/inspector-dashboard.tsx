@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ActivityCharts } from "@/components/shared/activity-charts";
 import { AssignedFacilitiesTable } from "@/components/shared/assigned-facilities-table";
+import { ImuAssignedInspections } from "@/components/shared/imu-assigned-inspections";
 import { ComplianceSummary } from "@/components/shared/compliance-summary";
 import { DonutChart } from "@/components/shared/donut-chart";
 import { InspectionTrendChart } from "@/components/shared/inspection-trend-chart";
@@ -13,6 +14,7 @@ import { PageTitle } from "@/components/layout/page-title";
 import { ContentSwap, PageTransition } from "@/components/motion/page-transition";
 import { FilterDateRange } from "@/components/ui";
 import { buildInspectorDashboard } from "@/data/generators/inspector-dashboard";
+import { iiuAssignedTableCopy } from "@/data/iiu";
 import { getUnit } from "@/data/units";
 import type { ServiceKey, UnitKey } from "@/types";
 import type { ActivityChart } from "@/types/dashboard";
@@ -65,9 +67,11 @@ export function InspectorDashboard({
         }
       />
 
-      {isFpu ? (
+      {isFpu || unitId === "imu" ? (
         <div className="page-title flex min-w-0 items-center justify-between gap-3 border border-border bg-surface px-4 py-3 shadow-sm">
-          <p className="text-sm text-muted">Date range · All Dates</p>
+          <p className="text-sm text-muted">
+            {unitId === "imu" ? "Period · Q3 2026" : "Date range · All Dates"}
+          </p>
           <FilterDateRange label="Date range" />
         </div>
       ) : (
@@ -99,6 +103,9 @@ export function InspectorDashboard({
           <ComplianceSummary
             averageScore={data.compliance.averageScore}
             outcomes={data.compliance.outcomes}
+            outcomesTitle={
+              unitId === "iiu" ? "Inspection Decisions" : "Inspection Outcomes"
+            }
           />
         ) : null}
 
@@ -108,8 +115,26 @@ export function InspectorDashboard({
             ))
           : null}
 
-        {!isFpu ? (
-          <AssignedFacilitiesTable facilities={data.facilities} />
+        {unitId === "imu" ? <ImuAssignedInspections /> : null}
+
+        {!isFpu && unitId !== "imu" ? (
+          <AssignedFacilitiesTable
+            facilities={data.facilities}
+            title={
+              unitId === "iiu"
+                ? iiuAssignedTableCopy.tableTitle
+                : "Assigned Facilities"
+            }
+            columnLabels={
+              unitId === "iiu" ? iiuAssignedTableCopy.columns : undefined
+            }
+            emptyMessage={
+              unitId === "iiu" ? iiuAssignedTableCopy.emptyMessage : undefined
+            }
+            ariaLabel={
+              unitId === "iiu" ? iiuAssignedTableCopy.ariaLabel : undefined
+            }
+          />
         ) : null}
 
         {!isFpu && (data.activities.length > 0 || data.sampling.length > 0) ? (

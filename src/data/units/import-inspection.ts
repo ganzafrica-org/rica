@@ -1,59 +1,35 @@
 import type { UnitContentSpec } from "@/data/units/content-spec";
+import {
+  iiuEntryOfficeCodes,
+  iiuInspectionDecisions,
+  iiuTinNumbers,
+} from "@/data/iiu";
 
 /**
- * Import Inspection Unit.
- *
- * No operational forms or datasets were reviewed for this unit in the source
- * doc. The content below is a plausible placeholder built from the unit's
- * mandate — inspection of consignments at points of entry — and should be
- * replaced once the real forms are shared.
+ * Import Inspection Unit — consignment inspections at entry offices.
  */
 export const importInspectionContent: UnitContentSpec = {
   unit: "iiu",
   services: {
     all: {
-      facilityPrefixes: [
-        "Gatuna",
-        "Rusumo",
-        "Kagitumba",
-        "Rubavu",
-        "Kigali Logistics",
-        "Bugesera",
-      ],
-      facilitySuffixes: [
-        "Border Post",
-        "Dry Port",
-        "Bonded Warehouse",
-        "Airport Cargo",
-        "Customs Terminal",
-      ],
-      classifications: [
-        "Land Border Post",
-        "Airport Cargo",
-        "Bonded Warehouse",
-        "Dry Port",
-      ],
+      facilityPrefixes: iiuEntryOfficeCodes.map((office) => office.label),
+      facilitySuffixes: [""],
+      classifications: iiuTinNumbers.map((tin) => tin.label),
       workloadScale: 44,
       activities: [
         {
           id: "consignments-by-entry",
           title: "Consignments Inspected by Point of Entry",
-          caption: "Import consignments cleared in the selected period",
+          caption: "By entry office code",
           kind: "bar",
-          categories: [
-            "Gatuna",
-            "Rusumo",
-            "Kagitumba",
-            "Airport Cargo",
-            "Dry Port",
-          ],
+          categories: iiuEntryOfficeCodes.map((office) => office.label),
           scale: 20,
         },
         {
           id: "consignment-decisions",
-          title: "Consignment Decisions",
+          title: "Inspection Decisions",
           kind: "donut",
-          categories: ["Released", "Detained", "Re-exported", "Destroyed"],
+          categories: iiuInspectionDecisions.map((decision) => decision.label),
           scale: 24,
         },
       ],

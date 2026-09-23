@@ -18,6 +18,11 @@ import {
 import { ChartCard } from "@/components/shared/chart-card";
 import { donutPalette } from "@/data/director/dashboard";
 import type { NamedValue, StackedRow, TrendPoint } from "@/data/director/dashboard";
+import {
+  scaleNamedValues,
+  scaleStackedRows,
+  scaleTrendPoints,
+} from "@/lib/chart-period";
 
 const tooltipStyle = {
   borderRadius: 8,
@@ -57,9 +62,12 @@ export function DirectorLineChart({
 }: LineChartCardProps) {
   return (
     <ChartCard title={title} caption={description}>
+      {(period) => {
+        const series = scaleTrendPoints(data, period);
+        return (
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
+          <LineChart data={series} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="month"
@@ -101,6 +109,8 @@ export function DirectorLineChart({
           </LineChart>
         </ResponsiveContainer>
       </div>
+        );
+      }}
     </ChartCard>
   );
 }
@@ -124,40 +134,48 @@ export function DirectorBarChart({
 }: BarChartCardProps) {
   return (
     <ChartCard title={title} caption={description}>
-      <div className="h-52 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
-            <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
-            <XAxis
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "var(--muted)", fontSize: 11 }}
-              interval={0}
-              angle={-15}
-              textAnchor="end"
-              height={48}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "var(--muted)", fontSize: 12 }}
-            />
-            <Tooltip contentStyle={tooltipStyle} />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-              {data.map((entry, index) => (
-                <Cell
-                  key={entry.name}
-                  fill={
-                    color ??
-                    chartColors[(index + colorOffset) % chartColors.length]
-                  }
+      {(period) => {
+        const series = scaleNamedValues(data, period);
+        return (
+          <div className="h-52 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={series}
+                margin={{ top: 8, right: 12, left: 4, bottom: 4 }}
+              >
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "var(--muted)", fontSize: 11 }}
+                  interval={0}
+                  angle={-15}
+                  textAnchor="end"
+                  height={48}
                 />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "var(--muted)", fontSize: 12 }}
+                />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                  {series.map((entry, index) => (
+                    <Cell
+                      key={entry.name}
+                      fill={
+                        color ??
+                        chartColors[(index + colorOffset) % chartColors.length]
+                      }
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      }}
     </ChartCard>
   );
 }
@@ -177,18 +195,21 @@ export function DirectorDonutChart({
 }: DonutChartCardProps) {
   return (
     <ChartCard title={title} caption={description}>
+      {(period) => {
+        const series = scaleNamedValues(data, period);
+        return (
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={series}
               dataKey="value"
               nameKey="name"
               innerRadius={48}
               outerRadius={72}
               paddingAngle={2}
             >
-              {data.map((entry, index) => (
+              {series.map((entry, index) => (
                 <Cell
                   key={entry.name}
                   fill={
@@ -206,6 +227,8 @@ export function DirectorDonutChart({
           </PieChart>
         </ResponsiveContainer>
       </div>
+        );
+      }}
     </ChartCard>
   );
 }
@@ -225,9 +248,10 @@ export function DirectorStackedBarChart({
 }: StackedBarCardProps) {
   return (
     <ChartCard title={title} caption={description}>
+      {(period) => (
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
+          <BarChart data={scaleStackedRows(data, period)} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="name"
@@ -258,6 +282,7 @@ export function DirectorStackedBarChart({
           </BarChart>
         </ResponsiveContainer>
       </div>
+      )}
     </ChartCard>
   );
 }
@@ -271,9 +296,10 @@ export function DirectorGroupedBarChart({
 }: StackedBarCardProps) {
   return (
     <ChartCard title={title} caption={description}>
+      {(period) => (
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
+          <BarChart data={scaleStackedRows(data, period)} margin={{ top: 8, right: 12, left: 4, bottom: 4 }}>
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="name"
@@ -308,6 +334,7 @@ export function DirectorGroupedBarChart({
           </BarChart>
         </ResponsiveContainer>
       </div>
+      )}
     </ChartCard>
   );
 }

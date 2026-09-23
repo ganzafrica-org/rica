@@ -20,6 +20,8 @@ import type { AuthUser } from "@/types";
 /** Short, scannable label for a demo account card. */
 function demoAccountLabel(user: AuthUser): string {
   if (user.role === "senior-director") return "Senior Director";
+  if (user.role === "senior-inspector") return user.title;
+  if (user.unit === "imu") return user.title;
   const unit = getUnit(user.unit).shortLabel;
   return user.role === "director"
     ? `Director · ${unit}`

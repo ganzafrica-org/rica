@@ -6,18 +6,21 @@ export const SESSION_COOKIE = "rica_session";
 
 export const roleHomePath: Record<UserRole, string> = {
   inspector: "/inspector",
+  "senior-inspector": "/director",
   director: "/director",
   "senior-director": "/senior-director",
 };
 
 export const rolePortalLabel: Record<UserRole, string> = {
   inspector: "Inspector portal",
+  "senior-inspector": "Senior inspector portal",
   director: "Director portal",
   "senior-director": "Senior Director portal",
 };
 
 export const rolePathPrefix: Record<UserRole, string> = {
   inspector: "/inspector",
+  "senior-inspector": "/director",
   director: "/director",
   "senior-director": "/senior-director",
 };
@@ -29,6 +32,9 @@ export const rolePathPrefix: Record<UserRole, string> = {
 export function getPortalLabel(user: AuthUser): string {
   if (user.role === "senior-director") {
     return rolePortalLabel[user.role];
+  }
+  if (user.unit === "imu") {
+    return user.title;
   }
 
   const unit = businessUnits[user.unit];

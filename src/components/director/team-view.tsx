@@ -35,20 +35,20 @@ export function DirectorTeamView() {
         filterMode={data.filterMode === "categories" || data.filterMode === "imu" ? "basic" : data.filterMode}
         values={filters}
         onChange={onFilterChange}
-        hideProductCategory
-        hideProductName
       />
 
       <DirectorTeamTable rows={data.team} officerLabel={officerLabel} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <DirectorLineChart
-          title="Unit Completion Trend"
-          data={filtered.completionTrend}
-          valueLabel="Completed"
-          color={chartColors[0]}
-        />
-      </div>
+      {unitKey === "iiu" ? null : (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <DirectorLineChart
+            title="Unit Completion Trend"
+            data={filtered.completionTrend}
+            valueLabel="Completed"
+            color={chartColors[0]}
+          />
+        </div>
+      )}
     </PageTransition>
   );
 }

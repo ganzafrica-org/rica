@@ -13,6 +13,10 @@ export { DirectorTeamView } from "./team-view";
 export { DirectorStreamsView } from "./streams-view";
 export { DirectorKpiGrid } from "./kpi-grid";
 export {
+  DirectorAssignmentList,
+  DirectorWorkloadTables,
+} from "./workload-tables";
+export {
   DirectorBarChart,
   DirectorDonutChart,
   DirectorGroupedBarChart,
